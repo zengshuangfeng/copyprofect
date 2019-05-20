@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IPKGameDao">
+	<select id="getPKFuuidList" resultType="com.meisui.manage.entity.PK_Result">
+		select distinct(a.anchor_f_uuid) from t_pk_result a ,t_user_info b  where a.id>0 and a.anchor_f_uuid = (select f_uuid from t_user where id = b.uid)
+		<if test="uid>0">
+		 and anchor_f_uuid in (select f_uuid from t_user where id = #{uid})
+		</if>
+		<if test="nickname !=null and nickname !=''">
+		and uid in (select id from t_user where nickname = #{nickname})
+		</if>
+		  ORDER BY b.grading_score desc limit #{offset},#{rows}
+	</select>
+		<select id="getPKresultbyfuuid" resultType="com.meisui.manage.entity.PK_Result">
+		select anchor_f_uuid,count(1) as count from t_pk_result where anchor_f_uuid=#{anchor_f_uuid} 
+		<if test="isuccess >-1">
+		 and isuccess=#{isuccess}
+		</if>
+		</select>
+		<select id="getPKGameCount" resultType="Integer">
+		select count(distinct(anchor_f_uuid)) from t_pk_result where id>0
+		<if test="uid>0">
+		 and anchor_f_uuid in (select f_uuid from t_user where id = #{uid})
+		</if>
+		<if test="nickname !=null and nickname !=''">
+		and uid in (select id from t_user where nickname = #{nickname})
+		</if>
+		</select>
+		<select id="getPKGameRecordList" resultType="com.meisui.manage.entity.PK_Result">
+		select id,gameuuid,anchor_f_uuid,score,isuccess,create_time from t_pk_result where anchor_f_uuid=#{anchor_f_uuid}
+		 ORDER BY create_time desc limit #{offset},#{rows}
+		</select>
+		<select id="getPKGameRecordCount" resultType="Integer">
+		select count(1) from t_pk_result where anchor_f_uuid=#{anchor_f_uuid}
+		</select>
+		<select id="getpkResultByGameuuid" resultType="com.meisui.manage.entity.PK_Result">
+		select id,gameuuid,anchor_f_uuid,score,isuccess,create_time from t_pk_result where gameuuid=#{gameuuid} and anchor_f_uuid !=#{anchor_f_uuid}
+		</select>
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.Iuser_PushDao">
+	<insert id="insertUser_Push"  useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.User_Push">
+		insert into user_push(title,p_content,start_time,end_time,href,url,style2,p_range,token,lt,p_where,version,platform,w_name,update_time,type,is_push) 
+		              values(#{title},#{p_content},#{start_time},#{end_time},#{href},#{url},#{style2},#{p_range},#{token},#{lt},#{p_where},#{version},#{platform},#{w_name},#{update_time},#{type},#{is_push})
+	</insert>
+	
+	<select id="getUserPushList" resultType="com.meisui.manage.entity.User_Push">
+		select id,title,p_content,pic,start_time,end_time,p_range,p_where,is_push,w_name,update_time,style2,href,icon,headtitle,lt,isblank,subtitle,istest,url,islist,token,version,platform,channel
+		from user_push where is_del = 0 
+		<if test="s_time != null and s_time != ''">
+		 and start_time &gt;= #{s_time}
+		</if>
+		<if test="e_time != null and e_time != ''">
+		and end_time &lt; #{e_time}
+		</if>
+		<if test="platform !=null and platform !=''">
+		and platform = #{platform}
+		</if>			
+		order by update_time desc limit #{offset},#{rows}
+	</select>
+	
+	<select id="getUserPushCount" resultType="Integer">
+		select count(1)
+		from user_push where is_del = 0 
+		<if test="s_time != null and s_time != ''">
+		 and start_time &gt;= #{s_time}
+		</if>
+		<if test="e_time != null and e_time != ''">
+		and start_time &lt; #{e_time}
+		</if>
+		<if test="platform !=null and platform !=''">
+		and platform = #{platform}
+		</if>	
+	</select>
+	
+	<select id="getUserPush" resultType="com.meisui.manage.entity.User_Push">
+		select * from user_push where id= #{id} 
+	</select>
+	
+	<delete id="deleteUserPush">
+		update user_push set is_del = 1, w_name = #{w_name} where id = #{id}
+	</delete>
+	
+	<update id="updateUserPush" parameterType="com.meisui.manage.entity.User_Push">
+		update user_push set 
+		title = #{title},
+		p_content = #{p_content},
+		start_time = #{start_time},
+		end_time = #{end_time},
+		href=#{href},
+		style2 = #{style2},
+		p_range = #{p_range},
+		token = #{token},
+		lt = #{lt},
+		p_where = #{p_where},
+		url = #{url},
+		version = #{version},
+		platform = #{platform},
+		w_name = #{w_name},
+		update_time =#{update_time},
+		type = #{type} 
+		where id = #{id}
+	</update>
+	<insert id="insertUserPushBox">
+		insert into user_push_box(p_id,push_time,islook,token) 
+		              values(#{p_id},#{push_time},#{islook},#{token})
+	</insert>
+	<update id="repushUserPush" parameterType="com.meisui.manage.entity.User_Push">
+	update user_push set is_push = #{is_push} ,update_time = now(),w_name = #{w_name} where id = #{id}
+	</update>
+</mapper>  

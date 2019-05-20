@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IuserDao">
+	<select id="getUserAnchorList" resultType="com.meisui.manage.entity.User_Anchor">
+		select
+		a.id,a.uid,a.is_trial,a.type,u.nickname,u.f_uuid,u.operate_center_id,u.is_virtual,u.agent_id,i.total_anchor_virtual,i.surplus_anchor_virtual,i.follower_count,i.total_live_virtual,i.total_promote_virtual,a.anchor_state,a.anchor_type,u.balance_virtual
+		<!-- ,(select start_time from t_anchor_time where uid=a.uid order by start_time 
+			desc limit 1) as last_anchor_time -->
+		from t_user_anchor a inner join t_user u on a.uid=u.id left join
+		t_user_info i on a.uid=i.uid
+		where a.is_del = 0
+		<if test="uid != null and uid != ''">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+	
+		<if test="operate_centerid>0">
+			and u.operate_center_id = #{operate_centerid}
+		</if>
+		
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		
+		order by a.create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserAnchorCount" resultType="Integer">
+		select count(1)
+		from t_user_anchor a inner join t_user u on a.uid=u.id
+		where a.is_del = 0
+		<if test="uid != null and uid != ''">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+		
+		<if test="operate_centerid>0">
+			and u.operate_center_id = #{operate_centerid}
+		</if>
+		
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		
+	</select>
+	
+	<select id="getVirtualUserList" resultType="com.meisui.manage.entity.User">
+			select id,f_uuid,nickname,balance_virtual,operate_center_id,agent_id,agent_promoter_id,is_virtual from t_user where is_virtual=1 and isvest=0 
+		
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="operate_center_id>0">
+			and operate_center_id=#{operate_center_id}
+		</if>
+			<if test="agent_id>0">
+			and agent_id=#{agent_id}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and nickname=#{nickname}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+		order by register_time desc limit #{offset},#{rows}
+	</select>
+		<select id="getVirtualUserListCount" resultType="Integer">
+			select count(1) from t_user where is_virtual=1 and isvest=0 
+		
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+			<if test="operate_center_id>0">
+			and operate_center_id=#{operate_center_id}
+		</if>
+			<if test="agent_id>0">
+			and agent_id=#{agent_id}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and nickname=#{nickname}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+	</select>
+	
+	<update id="deleteUserAnchor">
+		update t_user_anchor set is_del = 1 where uid =
+		#{uid};
+		update t_user set is_anchor = 0 where id = #{uid}
+	</update>
+	<update id="updatevirtual">
+	update t_user set is_virtual=1 where f_uuid = #{f_uuid}
+	</update>
+	<update id="updateUserVIP">
+		update t_user set vip_time = #{vip_time} where id =
+		#{id};
+	</update>
+	<update id="updateUserAnchorState">
+		update t_user_anchor set anchor_state =
+		#{anchor_state},anchor_type = #{anchor_type} where uid = #{uid}
+	</update>
+	<update id="updateUserAnchorDivideProportion">
+		update t_user_info set divide_proportion =
+		#{divide_proportion} where uid = #{uid}
+	</update>
+	<select id="getUserAnchorDivideProportion" resultType="Integer">
+		select
+		divide_proportion from t_user_info where uid=#{uid}
+	</select>
+	<select id="getUserAnchorWithdraw" resultType="com.meisui.manage.entity.User_Info">
+		select
+		uid,withdraw_type,withdraw_name from t_user_info where
+		uid=#{uid}
+	</select>
+	<update id="updateUserAnchorWithdraw">
+		update t_user_info set withdraw_type =
+		#{withdraw_type},withdraw_pass=#{withdraw_pass},withdraw_name=#{withdraw_name}
+		where uid = #{uid}
+	</update>
+	<select id="getUser" resultType="com.meisui.manage.entity.User">
+		select * from t_user where id =
+		#{uid}
+	</select>
+	<select id="getUserAnchor" resultType="com.meisui.manage.entity.User_Anchor">
+		select * from
+		t_user_anchor where uid = #{uid}
+	</select>
+	<update id="updateUserAnchor" parameterType="com.meisui.manage.entity.User_Anchor">
+		update t_user_anchor
+		set anchor_cover = #{anchor_cover},anchor_type=
+		#{anchor_type},remark=#{remark},update_time=#{update_time},w_name=#{w_name},is_trial=#{is_trial},type=#{type},is_vip=#{is_vip}
+		where uid = #{uid}
+	</update>
+	<insert id="insertUserAnchor" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.meisui.manage.entity.User_Anchor">
+		insert into
+		t_user_anchor(uid,anchor_cover,anchor_type,anchor_notice,anchor_state,remark,create_time,update_time,w_name,is_trial,type,is_vip)
+		values(#{uid},#{anchor_cover},#{anchor_type},#{anchor_notice},#{anchor_state},#{remark},#{create_time},#{update_time},#{w_name},#{is_trial},#{type},#{is_vip})
+	</insert>
+	<insert id="insertUserInfo" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.meisui.manage.entity.User_Info">
+		insert into
+		t_user_info(uid,attention_count,follower_count)
+		values(#{uid},0,0)
+	</insert>
+	<update id="updateUserIsAnchor">
+		update t_user set is_anchor = #{is_anchor} where id =
+		#{uid}
+	</update>
+	<select id="getUserInfoExtraToken" resultType="String">
+		select token from t_user_info_extra where uid=#{uid} order by logintime desc
+		limit 1
+	</select>
+	<update id="updateUserSurplusAnchorVirtual">
+		update t_user_info set surplus_anchor_virtual =
+		surplus_anchor_virtual - #{sub} where uid = #{uid}
+	</update>
+	<select id="getUserInfo" resultType="com.meisui.manage.entity.User_Info">
+		select * from t_user_info
+		where uid = #{uid}
+	</select>
+	<select id="getUserList" resultType="com.meisui.manage.entity.User">
+		select id,nickname,f_uuid,`level`,register_time,balance_virtual,operate_center_id,is_anchor,istest,is_blocked,is_virtual,head_lock,nickname_lock from t_user where isvest = 0
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="t_uid>0">
+			and id=#{t_uid}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+		<if test="start_level>0">
+		 <![CDATA[ and `level`>=#{start_level} and `level`<=#{end_level} ]]>
+		</if>
+		<if test="s_time != null and s_time != ''">
+		<![CDATA[ and register_time>=#{s_time} ]]>
+		</if>
+		<if test="e_time != null and e_time != ''">
+		<![CDATA[ and register_time<#{e_time} ]]>
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and nickname like "%"#{nickname}"%"
+		</if>
+		<if test="remark != null and remark != ''">
+			and remark like "%"#{remark}"%"
+		</if>
+		<choose>
+			<when test="sort==1"> order by balance_virtual desc,register_time desc </when>
+			<otherwise> order by register_time desc </otherwise>
+		</choose>
+		 limit #{offset},#{rows}
+	</select>
+	<select id="getUserCount" resultType="Integer">
+		select count(1) from t_user where isvest = 0
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="t_uid>0">
+			and id=#{t_uid}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+		<if test="start_level>0">
+		 <![CDATA[ and `level`>=#{start_level} and `level`<=#{end_level} ]]>
+		</if>
+		<if test="s_time != null and s_time != ''">
+		<![CDATA[ and register_time>=#{s_time} ]]>
+		</if>
+		<if test="e_time != null and e_time != ''">
+		<![CDATA[ and register_time<#{e_time} ]]>
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and nickname like "%"#{nickname}"%"
+		</if>
+		<if test="remark != null and remark != ''">
+			and remark like "%"#{remark}"%"
+		</if>
+	</select>
+	<select id="getUserT1ByUid" resultType="String">
+		select distinct t1 from
+		t_user_start where uid = #{uid} and t1 is not null and t1!=''
+	</select>
+	<select id="getUserInfoT1ByUid" resultType="String">
+		select distinct t1
+		from t_user_info_extra where uid = #{uid} and t1 is not null and
+		t1!=''
+	</select>
+	<update id="saveRemak">
+		update t_user set remark=#{remark} where id=#{uid}
+	</update>
+	<select id="getExtraList" resultType="com.meisui.manage.entity.User_Extra">
+		select
+		id,mobile_model,mobile_brand,channel,system_version,software_version,platform,first_time
+		from t_user_extra where t1 in
+		<foreach collection="t1List" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		order by id asc limit #{offset},#{rows}
+	</select>
+	<select id="getDeviceList" resultType="com.meisui.manage.entity.User_Device">
+		select id,ip,apn,province,city,network,login_time from t_user_device
+		where t1 in
+		<foreach collection="t1List" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+		order by login_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getDeviceCount" resultType="Integer">
+		select count(1) from t_user_device where t1 in
+		<foreach collection="t1List" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<select id="getIdByUid" resultType="Integer">
+	
+	</select>
+	<select id="getUserPhone" resultType="String">
+		select phone from
+		t_user_phone where uid=#{uid} order by create_time desc limit 1
+	</select>
+	<select id="getUserLoginType" resultType="Integer">
+		select login_type from
+		t_user_third where uid = #{uid} order by create_time desc limit 1
+	</select>
+	<select id="getUserLastLoginTime" resultType="java.util.Date">
+		select logintime
+		from t_user_info_extra where uid=#{uid} order by logintime desc limit
+		1
+	</select>
+	<select id="getUserForbidList" resultType="com.meisui.manage.entity.User">
+		select
+		id,f_uuid,nickname,forbid_start_time,forbid_hour,is_forbid,w_name,update_time
+		from t_user where forbid_start_time is not null
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid=#{f_uuid}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and nickname like "%"#{nickname}"%"
+		</if>
+		<choose>
+			<when test="is_forbid==0">
+		 <![CDATA[ and (is_forbid = 0 or (is_forbid=1 and DATE_ADD(forbid_start_time,INTERVAL forbid_hour hour)<#{date})) ]]>
+			</when>
+			<when test="is_forbid==1">
+		   <![CDATA[ and is_forbid=1 and DATE_ADD(forbid_start_time,INTERVAL forbid_hour hour)>#{date} ]]>
+			</when>
+		</choose>
+		order by update_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserForbidCount" resultType="Integer">
+		select count(1) from t_user where forbid_start_time is not null
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid=#{f_uuid}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and nickname like "%"#{nickname}"%"
+		</if>
+		<choose>
+			<when test="is_forbid==0">
+		 <![CDATA[ and (is_forbid = 0 or (is_forbid=1 and DATE_ADD(forbid_start_time,INTERVAL forbid_hour hour)<#{date})) ]]>
+			</when>
+			<when test="is_forbid==1">
+		   <![CDATA[ and is_forbid=1 and DATE_ADD(forbid_start_time,INTERVAL forbid_hour hour)>#{date} ]]>
+			</when>
+		</choose>
+	</select>
+	<select id="getUserForbid" resultType="com.meisui.manage.entity.User">
+		select
+		forbid_start_time,forbid_hour,is_forbid from t_user where id=#{uid}
+	</select>
+	<update id="saveUserForbid">
+		update t_user set
+		forbid_start_time=#{forbid_start_time},forbid_hour=#{forbid_hour},is_forbid=1,w_name=#{w_name},update_time=#{update_time}
+		where id=#{uid}
+	</update>
+	<update id="cancelUserForbid">
+		update t_user set
+		is_forbid=0,w_name=#{w_name},update_time=#{update_time} where
+		id=#{uid}
+	</update>
+	<update id="updateUserIsTest">
+		update t_user set istest=#{istest} where id=#{id}
+	</update>
+	<update id="updateUserIsVirtual">
+		update t_user set is_virtual=#{is_virtual} where id=#{id}
+	</update>
+	<update id="updateUserBalanceVirtual">
+		update t_user set balance_virtual=balance_virtual+#{add} where id=#{id}
+	</update>
+	<select id="getUIdMakeList" resultType="com.meisui.manage.entity.Uid_Make">
+	    <![CDATA[SELECT id,uid_makeamends FROM t_uid_make3 WHERE is_use = 0 and id<494054 and id>#{id} limit 100000]]>
+	</select>
+	<select id="getUserAnchorList2" resultType="com.meisui.manage.entity.User_Anchor">
+		select
+		a.uid,u.f_uuid,a.is_trial,u.nickname,u.operate_center_id,u.agent_id
+		from t_user_anchor a inner join t_user u on a.uid=u.id left join
+		t_user_info i on a.uid=i.uid
+		where a.is_del = 0
+		<if test="uid != null and uid != ''">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+		<if test="operate_center_id>0">
+			and u.operate_center_id = #{operate_center_id}
+		</if>
+		<if test="agent_id>0">
+			and u.agent_id = #{agent_id}
+		</if>
+		<if test="is_trial>-1">
+			and a.is_trial = #{is_trial}
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		<![CDATA[ and exists(select id from t_anchor_record where uid=a.uid and point_time>=#{start_time} and point_time<#{end_time}) ]]>
+		order by a.create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserAnchorList3" resultType="com.meisui.manage.entity.User_Anchor">
+		select
+		a.id,a.uid,a.is_trial,a.type,u.nickname,u.f_uuid,u.operate_center_id,u.agent_id,i.total_anchor_virtual,i.surplus_anchor_virtual,i.follower_count,i.total_live_virtual,i.total_promote_virtual,a.anchor_state,a.anchor_type,u.balance_virtual
+		from t_user_anchor a inner join t_user u on a.uid=u.id left join
+		t_user_info i on a.uid=i.uid
+		where a.is_del = 0
+		<if test="start_date !='' and end_date !=''">
+		<![CDATA[and a.create_time >= #{start_date} and a.create_time < #{end_date} ]]>
+		</if>
+		<if test="uid != null and uid != ''">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+	
+		<if test="operate_centerid>0">
+			and u.operate_center_id = #{operate_centerid}
+		</if>
+		
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		
+		order by a.create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserAnchorCount2" resultType="Integer">
+		select count(1)
+		from t_user_anchor a inner join t_user u on a.uid=u.id
+		where a.is_del = 0
+		<if test="uid != null and uid != ''">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>	
+		<if test="operate_center_id>0">
+			and u.operate_center_id = #{operate_center_id}
+		</if>
+		<if test="agent_id>0">
+			and u.agent_id = #{agent_id}
+		</if>
+		<if test="is_trial>-1">
+			and a.is_trial = #{is_trial}
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		<![CDATA[ and exists(select id from t_anchor_record where uid=a.uid and point_time>=#{start_time} and point_time<#{end_time}) ]]>
+	</select>
+	<select id="getUserAnchorRecordList" resultType="com.meisui.manage.entity.Anchor_Record">
+		<![CDATA[select virtual_count,is_attend,is_effective,effective_time from t_anchor_record where uid=#{uid} and point_time>=#{start_time} and point_time<#{end_time} 
+		 order by point_time asc ]]>
+	</select>
+	<select id="getAnchorVirtualRuleList" resultType="com.meisui.manage.entity.Anchor_Virtual_Rule">
+		select
+		max_virtual,min_virtual,rank,base_salary,divide_proportion,effective_days
+		from t_anchor_virtual_rule order by min_virtual desc
+	</select>
+	<select id="getUserIdWithToken" resultType="Long">
+		select uid from t_user_info_extra where token=#{token} order by logintime
+		desc limit 1
+	</select>
+	<update id="updateUserTotalAnchorVirtual">
+		update t_user_info set total_anchor_virtual =
+		total_anchor_virtual - #{sub} where uid = #{uid}
+	</update>
+	<select id="getUserIdWithF_uuid" resultType="Long">
+		select id from t_user where f_uuid=#{f_uuid}
+	</select>
+	<select id="getUserReal" resultType="com.meisui.manage.entity.User_Real">
+		select
+		name,card,tel,address,alipay_account from t_user_real where uid=#{uid}
+	</select>
+	<update id="updateUserHeadLock">
+		update t_user set head_lock=#{head_lock}
+		<if test="head_lock==1">
+			,head='default.png'
+		</if>
+		where id = #{id}
+	</update>
+	<update id="updateUserHead">
+		update t_user set head = #{head} where id=#{id}
+	</update>
+	<update id="updatebalance_virtual">
+		update t_user set
+		balance_virtual=balance_virtual+#{balance_virtual} where id = #{id}
+	</update>
+
+	<update id="updateUserNicknameLock">
+		update t_user set nickname_lock=#{nickname_lock}
+		<if test="nickname_lock==1">
+			,nickname='违规昵称'
+		</if>
+		where id = #{id}
+	</update>
+	<update id="updateUserKeyCount">
+		update t_user set key_count=key_count+#{add} where id
+		= #{id}
+	</update>
+	<select id="getUidMakeList" resultType="Long">
+		select uid_makeamends
+		from t_uid_make3 where uid_makeamends not in (select f_uuid from
+		t_user) order by id asc limit #{offset},#{rows}
+	</select>
+	<update id="updateUserIsBlocked">
+		update t_user set is_blocked=#{is_blocked} where id =
+		#{id}
+	</update>
+	<select id="getUIdListWithNickanme" resultType="Long">
+		select id from t_user where nickname like "%"#{nickname}"%" limit 100
+	</select>
+	<select id="getUserVestList" resultType="com.meisui.manage.entity.User">
+		select id,f_uuid,nickname,head,`level`,sex,balance_virtual from t_user
+		where isvest=1 and is_blocked=0
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and nickname like "%"#{nickname}"%"
+		</if>
+		order by register_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserVestCount" resultType="Integer">
+		select count(1) from t_user where isvest=1 and is_blocked=0
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and nickname like "%"#{nickname}"%"
+		</if>
+	</select>
+	<insert id="insertUser" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.meisui.manage.entity.User">
+		INSERT INTO t_user (
+		f_uuid,head,nickname,character_autograph,register_time,sex,`level`,isvest,area,birthday,invite_code,vip_time)
+		VALUES
+		(#{f_uuid},#{head},#{nickname},#{character_autograph},#{register_time},#{sex},#{level},#{isvest},#{area},#{birthday},#{invite_code},#{vip_time})
+	</insert>
+	<update id="updatetUser" useGeneratedKeys="true" keyProperty="id"
+		parameterType="com.meisui.manage.entity.User">
+		update t_user set
+		nickname=#{nickname},head=#{head},`level`=#{level},
+		sex=#{sex},province=#{province},city=#{city},area=#{area},birthday=#{birthday}
+		where id=#{id}
+	</update>
+	<insert id="insertUserInfoExtra" useGeneratedKeys="true"
+		keyProperty="id" parameterType="com.meisui.manage.entity.User_Info_Extra">
+		INSERT INTO t_user_info_extra (
+		t1,token,uid)
+		VALUES (#{t1},#{token},#{uid})
+	</insert>
+	<update id="updateUserSurplusVideoVirtual">
+		update t_user_info set
+		surplus_video_virtual=surplus_video_virtual-#{add} where uid = #{uid}
+	</update>
+	<select id="getUserNicknameExist" resultType="Long">
+		select id from
+		t_user where nickname=#{nickname} limit 1
+	</select>
+	<select id="getUserScore" resultType="Long">
+		select score from t_user_info where uid=#{uid}
+	</select>
+	<update id="updateUserScore">
+		update t_user_info set score = #{score} where
+		uid=#{uid}
+	</update>
+	<select id="getUserCanLevel" resultType="Integer">
+		 <![CDATA[select level from t_level_score where score<=#{score} and is_online=1 order by `level` desc limit 1]]>
+	</select>
+	<update id="updateUserLevel">
+		update t_user set `level` = #{level} where id=#{uid}
+	</update>
+	<select id="getUserAnchorPayList" resultType="com.meisui.manage.entity.User_Anchor">
+		select
+		a.uid,a.type,a.create_time,u.nickname,u.f_uuid,i.total_anchor_virtual,i.surplus_anchor_virtual
+		from t_user_anchor a inner join t_user u on a.uid=u.id left join
+		t_user_info i on a.uid=i.uid
+		where a.is_del = 0
+		<if test="uid>0">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+		
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		<if test="settle_type==0"><!-- settle_type: 0周结 1日结  -->
+		 <![CDATA[and exists(select id from t_profit where uid=a.uid and (type=0 or type=7) and create_time>#{start_time} limit 1) ]]>
+		</if>
+		<if test="settle_type==1">
+		 <![CDATA[and i.surplus_anchor_virtual>0 ]]>
+		</if>
+		order by a.create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserAnchorPayCount" resultType="Integer">
+		select count(1)
+		from t_user_anchor a inner join t_user u on a.uid=u.id left join
+		t_user_info i on a.uid=i.uid
+		where a.is_del = 0
+		<if test="uid>0">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+		
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		<if test="settle_type==0">
+		 <![CDATA[and exists(select id from t_profit where uid=a.uid and (type=0 or type=7) and create_time>#{start_time} limit 1) ]]>
+		</if>
+		<if test="settle_type==1">
+		 <![CDATA[and i.surplus_anchor_virtual>0 ]]>
+		</if>
+	</select>
+	<select id="getUserTotalStake" resultType="Long">
+		<![CDATA[ select sum(stake) from t_user_stake where f_uuid=#{f_uuid} and is_secret = 0]]>
+	</select>
+	<update id="updateUserSurplusSecretVirtual">
+		update t_user_info set surplus_secret_virtual =
+		surplus_secret_virtual - #{sub} where uid = #{uid}
+	</update>
+	<select id="getUserNicknameWithF_uuid" resultType="String">
+		select
+		nickname from t_user where f_uuid=#{f_uuid}
+	</select>
+
+	<select id="getUserInfoList" resultType="com.meisui.manage.entity.User_Info">
+		<![CDATA[ select uid,total_anchor_virtual,surplus_anchor_virtual from t_user_info where surplus_anchor_virtual>=#{surplus_anchor_virtual} ]]>
+<!-- 		<if test="union_id>0">
+			and uid in (select uid from t_user_anchor where union_id=#{union_id})
+		</if> -->
+	</select>
+	<select id="getRegisterLoginStatisticsList" resultType="com.meisui.manage.entity.RegisterLoginStatistics">
+		SELECT t_login.login_date as statis_date,IF(t_register.register_count IS NULL , 0, t_register.register_count) as
+		register_count,t_login.user_count as user_count,t_login.login_count as login_count FROM
+
+		(SELECT t_base_date.date as login_date,IF(t_user_login.user_count IS NULL ,
+		0, t_user_login.user_count) as user_count,IF(t_user_login.login_count
+		IS NULL , 0, t_user_login.login_count) as login_count FROM(
+
+		SELECT DATE(logintime) as login_time,COUNT(DISTINCT uid)as
+		user_count,COUNT(uid) as login_count FROM t_user_info_extra 
+		
+		<where> 
+		    <if test="start_time!=null and end_time!=null">
+		         DATE(logintime) BETWEEN date(#{start_time}) AND date(#{end_time})    
+		    </if>	
+		    <if test="channel!='' and platform!=null">
+		         and uid in(SELECT id FROM t_user WHERE channel = #{channel} and platform = #{platform})
+		    </if>	
+		</where>
+		
+		GROUP BY login_time)as t_user_login
+
+		RIGHT JOIN
+
+		(SELECT date FROM t_date 
+		<where>
+		    <if test="start_time!=null and end_time!=null">
+		         date BETWEEN date(#{start_time}) AND date(#{end_time})    
+		    </if>		
+		</where>
+		
+		)as t_base_date ON t_base_date.date = t_user_login.login_time) as t_login
+
+		LEFT JOIN (SELECT DATE(register_time) as registertime,COUNT(id) as
+		register_count FROM t_user 
+		<where>
+		    <if test="start_time!=null and end_time!=null">
+		         DATE(register_time) BETWEEN date(#{start_time}) AND date(#{end_time})    
+		    </if>
+		    <if test="channel!='' and platform!=null">
+		         and channel = #{channel} and platform = #{platform}
+		    </if>			    		
+		</where>		
+		
+		GROUP BY registertime) as t_register ON
+		t_register.registertime = t_login.login_date ORDER BY statis_date ASC limit #{offset},#{rows}
+		
+	</select>
+	<select id="getRegisterLoginStatisticsCount" resultType="Integer">
+	   select count(1) from(SELECT date FROM t_date 
+		  <where>
+		    <if test="start_time!=null and end_time!=null">
+		         date BETWEEN date(#{start_time}) AND date(#{end_time})    
+		    </if>			    
+		</where>
+		)as t_tmp_date	
+	</select>
+	<select id="getRegisterLoginStatisticsSummary" resultType="com.meisui.manage.entity.RegisterLoginStatistics">
+		select sum(register_count) as register_count,sum(user_count) as user_count,sum(login_count) as login_count from(SELECT t_login.login_date as statis_date,IF(t_register.register_count IS NULL , 0, t_register.register_count) as
+		register_count,t_login.user_count as user_count,t_login.login_count as login_count FROM
+
+		(SELECT t_base_date.date as login_date,IF(t_user_login.user_count IS NULL ,
+		0, t_user_login.user_count) as user_count,IF(t_user_login.login_count
+		IS NULL , 0, t_user_login.login_count) as login_count FROM(
+
+		SELECT DATE(logintime) as login_time,COUNT(DISTINCT uid)as
+		user_count,COUNT(uid) as login_count FROM t_user_info_extra 
+		
+		<where>
+		    <if test="start_time!=null and end_time!=null">
+		         DATE(logintime) BETWEEN date(#{start_time}) AND date(#{end_time})    
+		    </if>	
+		    <if test="channel!='' and platform!=null">
+		         and uid in(SELECT id FROM t_user WHERE channel = #{channel} and platform = #{platform})
+		    </if>			    	
+		</where>
+		
+		GROUP BY login_time)as t_user_login
+
+		RIGHT JOIN
+
+		(SELECT date FROM t_date 
+		<where>
+		    <if test="start_time!=null and end_time!=null">
+		         date BETWEEN date(#{start_time}) AND date(#{end_time})    
+		    </if>		
+		</where>
+		
+		)as t_base_date ON t_base_date.date = t_user_login.login_time) as t_login
+
+		LEFT JOIN (SELECT DATE(register_time) as registertime,COUNT(id) as
+		register_count FROM t_user 
+		<where>
+		    <if test="start_time!=null and end_time!=null">
+		         DATE(register_time) BETWEEN date(#{start_time}) AND date(#{end_time})    
+		    </if>		
+		    <if test="channel!='' and platform!=null">
+		         and channel = #{channel} and platform = #{platform}
+		    </if>			    
+		</where>		
+		
+		GROUP BY registertime) as t_register ON
+		t_register.registertime = t_login.login_date	
+	 ) as t_summary
+	</select>
+	<select id="getUserTotalGiftVirtual" resultType="Long">
+	  select sum(gift_virtual) from t_profit where uid=#{uid} and type=7
+	</select>
+	<select id="getUserAnchorOneList" resultType="com.meisui.manage.entity.User_Anchor">
+		select
+		a.id,a.uid,a.is_trial,a.type,u.nickname,u.f_uuid,i.total_one_virtual,i.surplus_one_virtual,a.anchor_type 
+		from t_user_anchor a inner join t_user u on a.uid=u.id left join
+		t_user_info i on a.uid=i.uid
+		where a.is_del = 0 and total_one_virtual > 0 
+		<if test="uid != null and uid != ''">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+	
+		<if test="is_trial>-1">
+			and a.is_trial = #{is_trial}
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		order by a.create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserAnchorOneCount" resultType="Integer">
+		select count(1)
+		from t_user_anchor a inner join t_user u on a.uid=u.id left join
+		t_user_info i on a.uid=i.uid
+		where a.is_del = 0 and total_one_virtual > 0 
+		<if test="uid != null and uid != ''">
+			and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and u.f_uuid = #{f_uuid}
+		</if>
+
+		<if test="is_trial>-1">
+			and a.is_trial = #{is_trial}
+		</if>
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+	</select>
+	<update id="updateUserSurplusOneVirtual">
+		update t_user_info set surplus_one_virtual =
+		surplus_one_virtual - #{sub} where uid = #{uid}
+	</update>
+	<update id="updateUserAnchorOneDisturb">
+		update t_user_anchor set one_disturb = #{one_disturb} where uid=#{uid}
+	</update>	
+	<select id="getUserAnchorOneDivideProportion" resultType="Integer">
+		select one_divide_proportion from t_user_info where uid=#{uid}
+	</select>
+	<update id="updateUserAnchorOneDivideProportion">
+		update t_user_info set one_divide_proportion =
+		#{one_divide_proportion} where uid = #{uid}
+	</update>
+	<update id="updateUserOneHead">
+		update t_user set one_head =
+		#{one_head} where id = #{id}
+	</update>
+	<select id="getInviteUidListByCenterId" resultType="Integer">
+		select count(1) from t_user where operate_center_id=#{operate_center_id}
+	</select>
+	<select id="getInviteUidListByCenterId2" resultType="Integer">
+		select ifnull(sum(invite_count),0) from t_invite_sort where operate_center_id=#{operate_center_id} 
+		  <if test="b_time !=null and b_time !=''">
+ 	 		<![CDATA[and create_time >= #{b_time} ]]>
+	 	   </if>
+ 		<if test="e_time !=null and e_time !=''">
+  			<![CDATA[ and create_time <= #{e_time} ]]>
+ 		</if>
+	</select>
+	
+	<select id="getUserNickNameByapuid" resultType="String">
+	select nickname from t_user where id=#{apuid}
+	</select>
+	<select id="getUseridByagentid" resultType="com.meisui.manage.entity.User">
+	select id from t_user where agent_promoter_id = #{agent_promoter_id}
+	</select>
+	<select id="getUserByUid" resultType="com.meisui.manage.entity.User">
+	select operate_center_id,agent_id,agent_promoter_id,nickname from t_user where id = #{recharge_uid}
+	</select>
+	<select id="getAnchorUidListByCenterId" resultType="Long">
+		select id from t_user
+		<where>
+				is_anchor=1 and operate_center_id=#{centerId}
+		</where>
+	</select>
+	<select id="getUidListByAgentId" resultType="Integer">
+		select count(1) from t_user where agent_id=#{agentId}
+	</select>
+	
+	<select id="getUidListByAgentId2" resultType="Integer">
+		select ifnull(sum(invite_count),0) from t_invite_sort where agent_id=#{agentId} and operate_center_id = #{centerId} 
+		 <if test="b_time !=null and b_time !=''">
+		 and <![CDATA[ create_time >= #{b_time} ]]>
+		 </if>
+		 <if test="e_time !=null and e_time !=''">
+		  <![CDATA[ and create_time <= #{e_time} ]]>
+		 </if>
+	</select>
+	
+	<select id="getAnchorUidListByAgentId" resultType="Long">
+		select id from t_user where agent_id=#{agentId} and is_anchor=1
+	</select>
+	<select id="getInviteUsersByCenterId" resultType="com.meisui.manage.entity.User">
+		select id,nickname,f_uuid from t_user where operate_center_id=#{centerId}
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		order by register_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getInviteUsersCountByCenterId" resultType="Integer">
+		select count(1) from t_user where operate_center_id=#{centerId}
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+	</select>
+	<select id="getInviteUserCountWithPromoter" resultType="Integer">
+		select count(1) from t_user where operate_center_id=#{operate_center_id} and agent_id=#{agent_id} and (agent_promoter_id=#{agent_promoter_id} or id=#{uid})
+	</select>
+	
+	<select id="getInviteUserCountWithPromoter2" resultType="Integer">
+		select ifnull(sum(invite_count),0) from t_invite_sort where operate_center_id=#{operate_center_id} and agent_id=#{agent_id} and  uid=#{uid} 
+		 <if test="b_time !=null and b_time !=''">
+		 and <![CDATA[ create_time >= #{b_time} ]]>
+		 </if>
+		 <if test="e_time !=null and e_time !=''">
+		  <![CDATA[ and create_time <= #{e_time} ]]>
+		 </if>
+	</select>
+	
+	<select id="getAllInviteUserCountWithPromoter" resultType="Integer">
+		select count(1) from t_user where agent_promoter_id=#{agent_promoter_id} or id=#{uid}
+	</select>
+	
+	<select id="getAllInviteUserCountWithPromoter2" resultType="Integer">
+		select  ifnull(sum(invite_count),0) from t_invite_sort where operate_center_id=#{operate_center_id} and agent_id=#{agentId}  and uid=#{uid} 
+
+ <if test="b_time !=null and b_time !=''">
+  <![CDATA[ and create_time >= #{b_time} ]]>
+ </if>
+ <if test="e_time !=null and e_time !=''">
+  <![CDATA[ and create_time <= #{e_time} ]]>
+ </if>
+	</select>
+	
+	<select id="getInviteUserList" resultType="com.meisui.manage.entity.User">
+	select id,nickname,register_time from t_user where operate_center_id=#{operate_center_id} 
+		<if test="uid>0">
+			and id=#{uid} 
+		</if>
+		<if test="agent_id>0">
+			and agent_id=#{agent_id} 
+		</if>
+		<if test="agent_promoter_id>0 and agent_promoter_uid==0">
+			and agent_promoter_id=#{agent_promoter_id} 
+		</if>
+		<if test="agent_promoter_id>0 and agent_promoter_uid>0">
+			and (agent_promoter_id=#{agent_promoter_id} or id=#{agent_promoter_uid})
+		</if>
+		order by register_time desc limit #{offset},#{rows}
+	</select>	
+	
+		<select id="getAllInviteUserList" resultType="com.meisui.manage.entity.User">
+		select id,nickname,register_time from t_user where operate_center_id=#{operate_center_id} 	
+		<if test="uid>0">
+			and id=#{uid} 
+		</if>
+		<if test="agent_id>0">
+			and agent_id=#{agent_id} 
+		</if>
+		<if test="agent_promoter_id>0 and agent_promoter_uid==0">
+			and agent_promoter_id=#{agent_promoter_id} 
+		</if>
+		<if test="agent_promoter_id>0 and agent_promoter_uid>0">
+			and (agent_promoter_id=#{agent_promoter_id} or id=#{agent_promoter_uid})
+		</if>
+		order by register_time desc
+	</select>	
+	
+	<select id="getInviteUserCount2" resultType="Integer">
+		select count(1) from t_user where operate_center_id=#{operate_center_id}
+		<if test="uid>0">
+			and id=#{uid} 
+		</if>
+		<if test="agent_id>0">
+			and agent_id=#{agent_id} 
+		</if>
+		<if test="agent_promoter_id>0 and agent_promoter_uid==0">
+			and agent_promoter_id=#{agent_promoter_id} 
+		</if>
+		<if test="agent_promoter_id>0 and agent_promoter_uid>0">
+			and (agent_promoter_id=#{agent_promoter_id} or id=#{agent_promoter_uid})
+		</if>
+	</select>
+	<select id="getTel" resultType="String">
+		select phone from t_user_phone where uid=#{uid}
+	</select>
+	<select id="totalInvite" resultType="Integer">
+		select count(1) from t_user where operate_center_id > 0
+	</select>
+		<select id="totalInvite2" resultType="Integer">
+		select ifnull(sum(invite_count),0) from t_invite_sort 
+		 <where> 		 
+			 <if test="b_time !=null and b_time !=''">
+			  <![CDATA[ create_time >= #{b_time} ]]>
+			 </if>
+			 <if test="e_time !=null and e_time !=''">
+			  <![CDATA[ and create_time <= #{e_time} ]]>
+			 </if>
+		</where>
+	</select>
+	
+	<select id="getUidByTelOnUserPhoneTable" resultType="Long">
+		select uid from t_user_phone where phone=#{tel} order by create_time desc limit 1
+	</select>
+	<select id="getUidByTelOnUserRealTable" resultType="Long">
+		select uid from t_user_real where tel=#{tel} order by id desc limit 1
+	</select>
+	<select id="getTelByUserRealTable" resultType="String">
+		select tel from t_user_real where uid=#{uid} order by id desc limit 1
+	</select>
+	<select id="getRealName" resultType="String">
+		select name from t_user_real where uid=#{uid} order by id desc limit 1
+	</select>
+	<select id="getUserAnchorIsDel" resultType="Integer">
+		select id from t_user_anchor where uid=#{uid} and is_del=1
+	</select>
+	<update id="updateUserAnchorIsDel">
+		update t_user_anchor set is_del=0 where uid=#{uid}
+	</update>
+	
+	<select id="getuidbyAgentpromoterid" resultType="com.meisui.manage.entity.User">
+	select id from t_user where agent_promoter_id = #{agent_promoter_id}
+	</select>
+	
+	<select id="getuidbyagentid" resultType="com.meisui.manage.entity.User">
+	select id from t_user where operate_center_id=#{operate_center_id} and agent_id= #{agent_id} and (agent_promoter_id = #{agent_promoter_id} or id=#{uid})
+	</select>
+	<select id="getUserIdByNickname" resultType="Long">
+	select id from t_user where nickname = #{nickname} limit 1
+	</select>
+	<select id="getUserFuuidByuid" resultType="Long">
+	select f_uuid from t_user where id=#{apuid}
+	</select>
+	<select id="getUserByF_uuid" resultType="com.meisui.manage.entity.User">
+	select id,is_virtual,nickname,head,operate_center_id from t_user where f_uuid=#{f_uuid}
+	</select>
+	<insert id="insertUserVirtualRecord" parameterType="com.meisui.manage.entity.User_Virtual_Record">
+		insert into
+		t_user_virtual_record(uid,w_name,create_time,type)
+		values(#{uid},#{w_name},#{date},#{type})
+	</insert>
+	<select id="getSettlementUserList" resultType="com.meisui.manage.entity.User_Info">
+		select uid,total_anchor_virtual,surplus_anchor_virtual from t_user u inner join t_user_info i on u.id=i.uid where agent_id=#{agent_id} and surplus_anchor_virtual>0
+	</select>
+	<select id="getUserByIsvest" resultType="com.meisui.manage.entity.User">
+	select id,nickname from t_user where isvest=1 order by register_time desc limit 100 
+	</select>
+	<update id="updatepostcountByuid" parameterType="com.meisui.manage.entity.User_Info">
+	update t_user_info set post_count = #{post_count} where uid=#{uid}
+	</update>
+	<select id="getUserByisAnchor" resultType="com.meisui.manage.entity.User">
+	select id from t_user where id=#{uid} and is_anchor=1 
+	</select>
+	<select id="getIsAnchorByFuuid" resultType="com.meisui.manage.entity.User">
+	select id from t_user where f_uuid = #{anchor_f_uuid} and is_anchor=1
+	</select>
+	<select id="getUserIsexist" resultType="com.meisui.manage.entity.User">
+	select id from t_user where id = #{uid}
+	</select>
+	<select id="getUserByAnchorList" resultType="com.meisui.manage.entity.User">
+		select u.id,u.f_uuid,u.operate_center_id,u.agent_id,u.agent_promoter_id,u.nickname,a.name as "agentName",a.divide,o.settlement_type,o.name AS "operate_center_name",s.end_time,s.start_time from t_user u
+		left join t_agent a on u.agent_id = a.id
+		left join t_operate_center o on o.id = u.operate_center_id
+		left join t_agent_settlement s on s.agent_id = a.id
+		where  u.is_anchor=1 and u.operate_center_id>0 and u.agent_id>0
+		<if test="type>-1">
+		and	o.settlement_type=#{type}
+		</if>
+		<if test="operate_center_id >0">
+		and	u.operate_center_id=#{operate_center_id}
+		</if>
+		<if test="agent_id >0">
+		and u.agent_id = #{agent_id}
+		</if>
+		<if test="agent_promoter_f_uuid>0">
+		and (u.agent_promoter_id in (select id from t_user where f_uuid = #{agent_promoter_f_uuid}) or u.id in (select id from t_user where f_uuid = #{agent_promoter_f_uuid}))
+		</if>	
+		 <if test="s_time !=null and s_time !=''">
+			  <![CDATA[ s.end_time >= #{s_time} ]]>
+			 </if>
+			 <if test="e_time !=null and e_time !=''">
+			  <![CDATA[ and s.end_time <= #{e_time} ]]>
+			 </if>
+			 GROUP BY u.id
+			 order by s.end_time desc limit #{offset},#{rows}
+	</select>
+		<select id="getUserByAnchorCount" resultType="Integer">
+		SELECT count(a.id) from (select u.id from t_user u
+		left join t_agent a on u.agent_id = a.id
+		left join t_operate_center o on o.id = u.operate_center_id
+		left join t_agent_settlement s on s.agent_id = a.id
+		where  u.is_anchor=1 
+		<if test="type>-1">
+		and	o.settlement_type=#{type}
+		</if>
+		<if test="operate_center_id >0">
+		and	u.operate_center_id=#{operate_center_id}
+		</if>
+		<if test="agent_id >0">
+		and u.agent_id = #{agent_id}
+		</if>
+		<if test="agent_promoter_f_uuid>0">
+		and u.agent_promoter_id in (select id from t_user where f_uuid = #{agent_promoter_f_uuid})
+		</if>	
+		 <if test="s_time !=null and s_time !=''">
+			  <![CDATA[ s.end_time >= #{s_time} ]]>
+			 </if>
+			 <if test="e_time !=null and e_time !=''">
+			  <![CDATA[ and s.end_time <= #{e_time} ]]>
+			 </if>
+		 GROUP BY u.id) a	 
+	</select>
+</mapper>

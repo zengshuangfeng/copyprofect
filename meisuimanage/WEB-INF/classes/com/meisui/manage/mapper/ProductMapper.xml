@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IproductDao">
+	<select id="getProductList" resultType="com.meisui.manage.entity.Product">
+		select id,name,pic,type,price,stock,sale_count,w_name,is_online,create_time,sort from t_product where is_del=0 
+		<if test="is_online>-1">
+		 and is_online=#{is_online} 
+		</if>
+		order by sort asc,id desc limit #{offset},#{rows}
+	</select>	
+	<select id="getProductCount" resultType="Integer">
+		select count(1) from t_product where is_del=0 
+		<if test="is_online>-1">
+		 and is_online=#{is_online} 
+		</if>
+	</select>	
+	<insert id="insertProduct" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Product">
+		insert into t_product
+		(name,description,pic,type,price,stock,issue,tips,sort,w_name,is_online,create_time,update_time)
+		values(#{name},#{description},#{pic},#{type},#{price},#{stock},#{issue},#{tips},#{sort},#{w_name},#{is_online},#{create_time},#{update_time})
+	</insert>	
+	<update id="updateProduct" parameterType="com.meisui.manage.entity.Product">
+		update t_product set 
+		name=#{name},
+		description=#{description},
+		pic=#{pic},
+		type=#{type},
+		price=#{price},
+		stock=#{stock},
+		issue=#{issue},
+		tips=#{tips},
+		sort=#{sort},
+		is_online=#{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+	<delete id="deleteProduct">
+		update t_product set is_del = 1,update_time=#{update_time},w_name = #{w_name} where id = #{id}
+	</delete>
+	<select id="getProduct" resultType="com.meisui.manage.entity.Product">
+		select *
+		from t_product where id = #{id}
+	</select>
+	<update id="updateProductOnline">
+		update t_product set 
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+</mapper>

@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IspendingDao">
+	<select id="getSpendingList" resultType="com.meisui.manage.entity.Spending">
+		select
+		create_time,gift_id,gift_name,spending_virtual,uid,spending_uid,type,is_box
+		from t_spending 
+		<where>
+			<if test="gift_id>0">
+				and gift_id = #{gift_id}
+			</if>
+			<if test="uid>0">
+				and uid = #{uid}
+			</if>
+			<if test="spending_uid>0">
+				and spending_uid = #{spending_uid}
+			</if>
+			<if test="gift_name !=null and gift_name !=''">
+				and gift_name=#{gift_name}
+			</if>
+			<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time >= #{s_time}]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+			</if>
+			<if test="operate_center_id >0">
+			and operate_center_id = #{operate_center_id}
+			</if>
+			<if test="agent_id >0">
+			and agent_id = #{agent_id}
+			</if>
+			<if test="2 > type">
+			and gift_id in (select id from t_gift_info where type=#{type}) and type !=4
+			</if>
+			<if test="type==2">
+			and type = 4
+			</if>
+		</where>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	
+		<select id="getVirtualList" resultType="com.meisui.manage.entity.Profit_Virtual">
+		select
+		create_time,gift_id,gift_name,gift_virtual,uid,send_uid,is_box,is_guard
+		from t_profit_virtual
+		<where>
+			<if test="gift_id>0">
+				and gift_id = #{gift_id}
+			</if>
+			<if test="uid>0">
+				and uid = #{uid}
+			</if>
+			<if test="send_uid>0">
+				and send_uid = #{send_uid}
+			</if>
+			<if test="re_operate_center_id>0">
+				and uid in (select id from t_user where operate_center_id=#{re_operate_center_id})
+			</if>
+			<if test="send_operate_center_id>0">
+				and send_uid in (select id from t_user where operate_center_id=#{send_operate_center_id})
+			</if>
+			<if test="re_agent_id>0">
+				and uid in (select id from t_user where agent_id=#{re_agent_id})
+			</if>
+			<if test="send_agent_id>0">
+				and send_uid in (select id from t_user where agent_id=#{send_agent_id})
+			</if>
+			<if test="gift_name !=null and gift_name !=''">
+				and gift_name=#{gift_name}
+			</if>
+			<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time >= #{s_time}]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+			</if>
+		</where>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+		<select id="getVirtualCount" resultType="Integer">
+		select
+		count(1)
+		from t_profit_virtual
+		<where>
+			<if test="gift_id>0">
+				and gift_id = #{gift_id}
+			</if>
+			<if test="uid>0">
+				and uid = #{uid}
+			</if>
+			<if test="send_uid>0">
+				and send_uid = #{send_uid}
+			</if>
+			<if test="re_operate_center_id>0">
+				and uid in (select id from t_user where operate_center_id=#{re_operate_center_id})
+			</if>
+			<if test="send_operate_center_id>0">
+				and send_uid in (select id from t_user where operate_center_id=#{send_operate_center_id})
+			</if>
+			<if test="re_agent_id>0">
+				and uid in (select id from t_user where agent_id=#{re_agent_id})
+			</if>
+			<if test="send_agent_id>0">
+				and send_uid in (select id from t_user where agent_id=#{send_agent_id})
+			</if>
+			<if test="gift_name !=null and gift_name !=''">
+				and gift_name=#{gift_name}
+			</if>
+			<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time >= #{s_time}]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+			</if>
+		</where>
+	
+	</select>
+	
+	<select id="getSpendingCount" resultType="Integer">
+		select count(1) from t_spending 
+		<where>
+				<if test="gift_id>0">
+				and gift_id = #{gift_id}
+			</if>
+			<if test="uid>0">
+				and uid = #{uid}
+			</if>
+			<if test="spending_uid>0">
+				and spending_uid = #{spending_uid}
+			</if>
+			<if test="gift_name !=null and gift_name !=''">
+				and gift_name=#{gift_name}
+			</if>
+			<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time >= #{s_time}]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+			</if>
+			<if test="operate_center_id >0">
+			and operate_center_id = #{operate_center_id}
+			</if>
+			<if test="agent_id >0">
+			and agent_id = #{agent_id}
+			</if>
+			<if test="2 > type">
+			and gift_id in (select id from t_gift_info where type=#{type}) and type !=4
+			</if>
+			<if test="type==2">
+			and type = 4
+			</if>
+		</where>
+	</select>
+	<select id="getSpendingSum" resultType="Long">
+		<![CDATA[select SUM(spending_virtual) from t_spending where spending_uid = #{spending_uid} and create_time >= #{start_time} and create_time <= #{end_time}]]>
+	</select>
+	<select id="getSpendingSumAll" resultType="Long">
+		<![CDATA[select SUM(spending_virtual) from t_spending where spending_uid = #{spending_uid}]]>
+	</select>
+	<select id="getSpendingListWithSpending_uid" resultType="com.meisui.manage.entity.Spending">
+		<![CDATA[select create_time,spending_virtual from t_spending where spending_uid=#{spending_uid} and create_time>=#{date} ]]>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getSpendingCountWithSpending_uid"
+		resultType="Integer">
+		<![CDATA[select count(1) from t_spending where spending_uid=#{spending_uid} and create_time>=#{date}]]>
+	</select>
+	<select id="getSpendingSumAllWithUid" resultType="Long">
+		<![CDATA[select IFNULL(SUM(spending_virtual),0) from t_spending where uid = #{uid}]]>
+	</select>
+	<select id="getSpendingStatisticsList" resultType="com.meisui.manage.entity.GiftSpendingStatistics">
+		select date(create_time) as
+		spending_date,gift_name,sum(spending_count) as spending_count
+		from t_spending
+		<where>
+			<if test="start_date!=null and end_date!=null">
+				date(create_time) between #{start_date} and #{end_date}
+			</if>
+			<if test="type>-1">
+			and gift_id in (select id from t_gift_info where type=#{type})
+			</if>
+		</where>
+		group by date(create_time),gift_name order by spending_date
+		asc,spending_count desc limit #{offset},#{rows}
+	</select>
+	<select id="getGiftSpendingStatisticsCount" resultType="Integer">
+		select count(1) from(select sum(spending_count) from t_spending
+		<where>
+			<if test="start_date!=null and end_date!=null">
+				date(create_time) between #{start_date} and #{end_date}
+			</if>
+			<if test="type>-1">
+			and gift_id in (select id from t_gift_info where type=#{type})
+			</if>
+		</where>
+		group by date(create_time),gift_name) as tb_base
+	</select>
+	<select id="getSpendingStatisticsSummary" resultType="Long">
+		SELECT SUM(spending_count) as spending_count FROM t_spending
+		<where>
+			<if test="start_date!=null and end_date!=null">
+				date(create_time) between #{start_date} and #{end_date}
+			</if>
+			<if test="type>-1">
+			and gift_id in (select id from t_gift_info where type=#{type})
+			</if>
+		</where>
+	</select>
+	<select id="getSpendingBysid" resultType="com.meisui.manage.entity.Spending">
+		select uid,gift_id,create_time,spending_uid,spending_virtual,spending_count,is_box
+		from t_spending where spending_uid=#{id} order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+	<select id="getSpendingBysid2" resultType="com.meisui.manage.entity.Spending">
+		select uid,gift_id,create_time,spending_uid,spending_virtual,spending_count,is_box
+		from t_spending where spending_uid
+		in(select id from t_user where agent_promoter_id = #{agent_promoter_id})
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getTotalSpendingCount" resultType="Integer">
+		select count(1) from t_spending where spending_uid=#{id}
+	</select>
+	<select id="getTotalSpendingCount2" resultType="Integer">
+		select count(1) from t_spending where spending_uid in(select id from t_user
+		where agent_promoter_id = #{agent_promoter_id})
+	</select>
+	<select id="getTotalSpendingByCenterId" resultType="Long">
+		select IFNULL(SUM(spending_virtual),0) from t_spending where type=0
+		and operate_center_id=#{centerId}
+		<if test="start_time!='' and end_time!=''">
+			<![CDATA[and uid in (select id from t_user where operate_center_id=#{centerId} and register_time>=#{start_time} and register_time<=#{end_time})]]>
+		</if>
+	</select>
+	<select id="getSpendingSumWithPromoterid" resultType="Long">
+		select
+		ifnull(sum(spending_virtual),0) from t_spending where uid in (select
+		id from t_user where operate_center_id=#{operate_center_id} and
+		agent_id=#{agent_id} and (agent_promoter_id=#{agent_promoter_id} or
+		id=#{uid}))
+	</select>
+	<select id="getSpendingSumWithPromoterid2" resultType="Long">
+		select ifnull(sum(spending_virtual),0) from t_spending where uid in
+		(select id from t_user where operate_center_id=#{operate_center_id}
+		and agent_id=#{agent_id} and (agent_promoter_id=#{agent_promoter_id}
+		or id=#{uid})
+			<if test="b_time!='' and e_time!=''">
+				<![CDATA[ and register_time>=#{b_time} and register_time<=#{e_time}]]>
+			</if>
+		)
+	</select>
+	<select id="getAllSpendingSumWithPromoterid" resultType="Long">
+		select
+		ifnull(sum(spending_virtual),0) from t_spending where uid in (select
+		id from t_user where agent_promoter_id=#{agent_promoter_id} or
+		id=#{uid})
+	</select>
+	<select id="getAllSpendingSumWithPromoterid2" resultType="Long">
+		select ifnull(sum(spending_virtual),0) from t_spending where uid in
+		(select id from t_user where (agent_promoter_id=#{agent_promoter_id} or
+		id=#{uid}) 
+			<if test="b_time!='' and e_time!=''">
+				<![CDATA[ and register_time>=#{b_time} and register_time<=#{e_time}]]>
+			</if>		
+		 )
+	</select>
+	<select id="getSpendingSum2" resultType="Long">
+		select ifnull(sum(spending_virtual),0) from t_spending where
+		uid=#{uid}
+		<if test="b_time!='' and b_time!=null">
+			<![CDATA[and create_time >= #{b_time}]]>
+		</if>
+		<if test="e_time!='' and e_time!=null">
+			<![CDATA[and create_time <= #{e_time}]]>
+		</if>
+	</select>
+	<select id="totalGive" resultType="Long">
+		select IFNULL(SUM(spending_virtual),0) from t_spending where type=0
+		and operate_center_id > 0
+		<if test="b_time!='' and e_time!=''">
+			<![CDATA[and uid in (select id from t_user where operate_center_id > 0 and register_time>=#{b_time} and register_time<=#{e_time})]]>
+		</if>
+	</select>
+	<select id="totalSpending_virtual" resultType="Long">
+		select IFNULL(SUM(spending_virtual),0) from t_spending where
+		operate_center_id > 0
+		<if test="b_time!='' and e_time!=''">
+			<![CDATA[and uid in (select id from t_user where operate_center_id > 0 and register_time>=#{b_time} and register_time<=#{e_time})]]>
+		</if>
+	</select>
+	<select id="getGuardRecord" resultType="com.meisui.manage.entity.Spending">
+	select id,operate_center_id,agent_id,uid,spending_virtual,gift_id,gift_name,create_time,spending_uid,type from t_spending where type=4	
+	<if test="operate_center_id >0">
+	and operate_center_id = #{operate_center_id}
+	</if>
+	<if test="agent_id >0">
+	and agent_id=#{agent_id}
+	</if>
+	<if test="send_uid>0">
+	and uid = #{send_uid}
+	</if>
+	<if test="anchor_f_uuid >0">
+	and spending_uid in (select id from t_user where f_uuid = #{anchor_f_uuid})
+	</if>
+	<if test="f_uuid >0">
+	and uid in (select id from t_user where f_uuid = #{f_uuid})
+	</if>
+	<if test="nickname !=null and nickname !=''">
+	and uid in(select id from t_user where nickname like "%"#{nickname}"%")
+	</if>
+	<if test="start_time != null and start_time != ''">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+		order by create_time desc limit #{offset},#{rows} 
+	</select>
+	<select id="getGuardRecordCount" resultType="Integer">
+	select count(1) from t_spending where type=4	
+	<if test="operate_center_id >0">
+	and operate_center_id = #{operate_center_id}
+	</if>
+	<if test="agent_id >0">
+	and agent_id=#{agent_id}
+	</if>
+	<if test="send_uid>0">
+	and uid = #{send_uid}
+	</if>
+	<if test="anchor_f_uuid >0">
+	and spending_uid in (select id from t_user where f_uuid = #{anchor_f_uuid})
+	</if>
+	<if test="f_uuid >0">
+	and uid in (select id from t_user where f_uuid = #{f_uuid})
+	</if>
+	<if test="nickname !=null and nickname !=''">
+	and uid in (select id from t_user where nickname like "%"#{nickname}"%")
+	</if>
+	<if test="start_time != null and start_time != ''">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+	</select>
+	<select id="getGuardRecharge" resultType="com.meisui.manage.entity.Spending">
+	select spending_virtual,uid,spending_uid from t_spending where uid=#{uid} and type=4
+	order by create_time limit #{offset},#{rows} 
+	</select>
+	<select id="getGuardRechargeCount" resultType="Integer">
+	select count(1) from t_spending where uid=#{uid} and type=4
+	</select>
+	<select id="getGuardRecharge2" resultType="com.meisui.manage.entity.Spending">
+	select spending_virtual,uid,spending_uid from t_spending where spending_uid=#{uid} and type=4 
+	order by create_time limit #{offset},#{rows} 
+	</select>
+	<select id="getGuardRechargeCount2" resultType="Integer">
+	select count(1) from t_spending where spending_uid=#{uid} and type=4 
+	</select>
+</mapper>

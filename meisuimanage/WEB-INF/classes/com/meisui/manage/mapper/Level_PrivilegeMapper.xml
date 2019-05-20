@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ilevel_PrivilegeDao">
+	<select id="getLevelPrivilegeList" resultType="com.meisui.manage.entity.Level_Privilege">
+		select id,`level`,icon,title,sort,w_name,update_time from t_level_privilege 
+		order by level asc limit #{offset},#{rows}
+	</select>	
+	<select id="getLevelPrivilegeCount" resultType="Integer">
+		select count(1) from t_level_privilege 
+	</select>		
+	<update id="updateLevelPrivilege" parameterType="com.meisui.manage.entity.Level_Privilege">
+		update t_level_privilege set 
+		`level` = #{level},
+		title = #{title},
+		icon = #{icon},
+		sort = #{sort},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<select id="getLevelPrivilege" resultType="com.meisui.manage.entity.Level_Privilege">
+		select *
+		from t_level_privilege where id = #{id}
+	</select>
+</mapper>

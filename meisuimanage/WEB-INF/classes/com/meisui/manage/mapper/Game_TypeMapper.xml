@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Igame_TypeDao">
+	<select id="getGameTypeList" resultType="com.meisui.manage.entity.Game_Type">
+		select id,name,is_open,sort from t_game_type order by sort asc
+	</select>		
+	<update id="updateGameTypeOpen">
+		update t_game_type set
+		is_open = #{is_open},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>	
+	<update id="updateGameTypeSort">
+		update t_game_type set
+		sort = #{sort},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+</mapper>

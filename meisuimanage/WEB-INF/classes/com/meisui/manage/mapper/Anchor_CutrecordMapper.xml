@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_CutrecordDao">	
+	<insert id="insertAnchorCutrecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Cutrecord">
+		insert into t_anchor_cutrecord
+		(uid,start_handle,end_handle,startup,w_name)
+		values(#{uid},#{start_handle},#{end_handle},#{startup},#{w_name})
+	</insert>	
+</mapper>
+
+ 
+  
+  
+  
+   

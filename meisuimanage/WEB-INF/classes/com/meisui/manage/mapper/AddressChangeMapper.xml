@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iaddress_ChangeDao">
+	<select id="getAlladdressChangeList" resultType="com.meisui.manage.entity.AddressChange">
+		select id,f_uuid,nickname,old_center_name,new_center_name,agentname,agentfuuid,create_name,DATE_FORMAT(create_time,'%Y-%m-%d %H:%i:%s') as create_time  from t_address_change
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getaddressChangeCount" resultType="Integer">
+		select count(1) from t_address_change 
+	</select>	
+	<select id="getUserBYFuid" resultType="com.meisui.manage.entity.AddressChange">
+		SELECT u.nickname,oc.`name` as old_center_name from t_user u LEFT JOIN t_operate_center oc 
+		ON oc.id=u.operate_center_id
+		WHERE f_uuid=#{f_uuid}
+	</select>
+	<select id="getAgentUserBYFuid" resultType="com.meisui.manage.entity.AddressChange">
+		SELECT ag.id as agent_promoter_id,ag.operate_center_id as operate_center_id,ag.agent_id as agent_id ,oc.`name` as new_center_name,tg.`name` as agentname FROM t_agent_promoter ag
+		LEFT JOIN t_operate_center oc ON oc.id=ag.operate_center_id
+		LEFT JOIN t_agent tg ON tg.id=ag.agent_id
+		WHERE uid = ( SELECT id FROM  t_user WHERE  f_uuid =#{f_uuid})
+	</select>
+	<insert id="saveAddressChange" useGeneratedKeys="true" keyProperty="id"  parameterType="com.meisui.manage.entity.AddressChange">
+	insert into t_address_change
+		(f_uuid,nickname,old_center_name,new_center_name,agentname,agentfuuid,create_name,create_time)
+		values(#{f_uuid},#{nickname},#{old_center_name},#{new_center_name},#{agentname},#{agentfuuid},#{create_name},now())
+	</insert>
+	<update id="updateUser" parameterType="com.meisui.manage.entity.AddressChange">
+	UPDATE t_user SET operate_center_id =#{operate_center_id},agent_id = #{agent_id},agent_promoter_id = #{agent_promoter_id} WHERE f_uuid = #{f_uuid}
+	</update>
+</mapper>
+
+ 
+  
+  
+  
+   

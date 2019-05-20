@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.ImessageDao">
+	<insert id="InsertMessage" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Message">
+	insert into t_message (from_manage_id,
+	<if test="to_agent_id>0">
+	to_agent_id,
+	</if>
+	<if test="to_operate_center_id>0 and to_agent_id==0">
+	to_operate_center_id,
+	</if>
+	<if test="to_pronvice_id>0 and to_operate_center_id==0 and to_agent_id==0">
+	to_pronvice_id,
+	</if>	
+	title,content,is_read,create_time,w_name) 
+	values(#{from_manage_id},
+	<if test="to_agent_id>0">
+	#{to_agent_id},
+	</if>
+	<if test="to_operate_center_id>0 and to_agent_id==0">
+	#{to_operate_center_id},
+	</if>
+	<if test="to_pronvice_id>0 and to_operate_center_id==0 and to_agent_id==0">
+	#{to_pronvice_id},
+	</if>	
+	#{title},#{content},#{is_read},#{create_time},#{w_name})
+	</insert>
+	<select id="getMassageCount" resultType="Integer">
+	select count(1) from t_message where to_manage_id=#{to_manage_id}
+	</select>
+	<select id="getMessageList" resultType="com.meisui.manage.entity.Message">
+		select id,from_manage_id,from_pronvice_id,from_operate_center_id,from_agent_id,to_manage_id,to_pronvice_id,to_operate_center_id,to_agent_id,
+		title,content,is_read,create_time,w_name from t_message where to_manage_id=#{to_manage_id} order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="imessageCount" resultType="Integer">
+		select count(1) from  t_message where to_manage_id=#{to_manage_id}
+	</select>
+	<update id="updateMessageByisread" parameterType="com.meisui.manage.entity.Message">
+	update t_message set is_read = #{read} where id=#{id}
+	</update>
+		<select id="messsageCount" resultType="Integer">
+	select count(1) from t_message where to_manage_id=#{to_manage_id} and is_read = 0
+	</select>
+</mapper>   

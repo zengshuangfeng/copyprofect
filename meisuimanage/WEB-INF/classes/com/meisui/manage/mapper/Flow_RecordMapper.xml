@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.Iflow_RecordDao">
+	<insert id="addRemark">
+		replace into t_flow_record (begin_time,end_time,remark,create_time) values (#{begin_time},#{end_time},#{remark},#{create_time})
+	</insert>
+	<select id="getRemark" resultType="String">
+		select remark from t_flow_record where
+		<![CDATA[begin_time=#{b_time} and end_time=#{e_time}]]>
+		limit 1
+	</select>
+</mapper>

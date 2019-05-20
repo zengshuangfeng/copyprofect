@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IcommunityDao">
+	<select id="getCommunityList" resultType="com.meisui.manage.entity.Community_Recommend">
+	select id,uid,type,title,start_time,end_time,sort,is_online,pic from t_community_recommend where
+			 is_del=0 and type=#{type}
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and start_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and end_time < #{end_time}]]>
+			</if>
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname = #{nickname})
+			</if>
+			order by sort desc,create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getCommunityRecommendRecordCount" resultType="Integer">
+	select count(1) from t_community_recommend where
+			is_del=0 and type=#{type}
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and start_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and end_time < #{end_time}]]>
+			</if>
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname = "%"#{nickname}"%")
+			</if>
+	</select>
+	<update id="deletePopularAnchor" parameterType="com.meisui.manage.entity.Community_Recommend">
+	update t_community_recommend set is_del = 1 ,w_name = #{w_name}, update_time = #{update_time} where id = #{id}
+	</update>
+	<update id="deleteHotlive" parameterType="com.meisui.manage.entity.Community_Recommend">
+	update t_community_recommend set is_del = 1 ,w_name = #{w_name}, update_time = #{update_time} where id = #{id}
+	</update>
+	<insert id="insertPopularAnchor" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Community_Recommend">
+		INSERT INTO t_community_recommend (
+		type,uid,title,start_time,end_time,sort,is_del,is_online,create_time,w_name,pic)
+		VALUES
+		(#{type},#{uid},#{title},#{start_time},#{end_time},#{sort},#{is_del},#{is_online},#{create_time},#{w_name},#{pic})
+		</insert>
+		<update id="updatePopularAnchor" parameterType="com.meisui.manage.entity.Community_Recommend">
+		update t_community_recommend set 
+		type=#{type},uid = #{uid},title = #{title},start_time= #{start_time},end_time=#{end_time},sort=#{sort},pic=#{pic},
+		is_del=#{is_del},is_online=#{is_online},update_time=#{update_time},w_name=#{w_name} where id = #{id}
+		</update>
+		<select id="getCommunityByid" resultType="com.meisui.manage.entity.Community_Recommend">
+		select id,uid,type,title,start_time,end_time,sort,is_online,pic from t_community_recommend where id = #{id}
+		</select>
+		<insert id="insertHotLive" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Community_Recommend">
+		INSERT INTO t_community_recommend (
+		type,uid,pic,start_time,end_time,sort,is_del,is_online,create_time,w_name)
+		VALUES
+		(#{type},#{uid},#{pic},#{start_time},#{end_time},#{sort},#{is_del},#{is_online},#{create_time},#{w_name})
+		</insert>
+		<update id="updatHotLive" parameterType="com.meisui.manage.entity.Community_Recommend">
+		update t_community_recommend set
+		type=#{type},uid = #{uid},pic = #{pic},start_time= #{start_time},end_time=#{end_time},sort=#{sort},
+		is_del=#{is_del},is_online=#{is_online},update_time=#{update_time},w_name=#{w_name} where id = #{id}
+		</update>
+		
+		<select id="getPostList" resultType="com.meisui.manage.entity.Post">
+		select id,type,uid,title,zan_count,share_count,comment_count,cover,video,create_time,update_time,is_online,is_del,is_top from t_post where  type=#{type} 
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and create_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and create_time < #{end_time}]]>
+			</if>
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="title !=null and title !=''">
+			and title like "%"#{title}"%"
+			</if>
+			<if test="f_uuid>0">
+			and uid in (select id from t_user where f_uuid = #{f_uuid})
+			</if>
+			order by is_top desc,update_time desc limit #{offset},#{rows}
+		</select>
+		<select id="getPostRecordCount" resultType="Integer">
+		select count(1) from t_post where  type=#{type} 
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and create_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and create_time < #{end_time}]]>
+			</if>
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="title !=null and title !=''">
+			and title like "%"#{title}"%"
+			</if>
+			<if test="f_uuid>0">
+			and uid in (select id from t_user where f_uuid = #{f_uuid})
+			</if>
+		</select>
+		<select id="getPostListBypostid" resultType="com.meisui.manage.entity.Post_Pic">
+			select id,post_id,pic,width,height,sort from t_post_pic where post_id=#{post_id} and is_del=0 order by sort asc
+		</select>
+		<insert id="insertPicManager" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Post">
+		INSERT INTO t_post (
+		type,uid,title,zan_count,share_count,create_time,is_del,is_online,tag_id,w_name,update_time)
+		VALUES
+		(#{type},#{uid},#{title},#{zan_count},#{share_count},#{create_time},#{is_del},1,#{tag_id},#{w_name},#{update_time})
+		</insert>
+		<update id="updatePicManager" parameterType="com.meisui.manage.entity.Post">
+		update t_post set
+		type=#{type},uid = #{uid},title = #{title},zan_count= #{zan_count},share_count=#{share_count},tag_id = #{tag_id},
+		update_time=#{update_time},w_name=#{w_name} where id = #{id}
+		</update>
+		<select id="getPostByid" resultType="com.meisui.manage.entity.Post">
+		select id,type,uid,title,zan_count,share_count,comment_count,is_online,cover,video,is_del,tag_id from t_post where id = #{id}
+		</select>
+		<select id="selectPicNameList" resultType="String">
+		select pic from t_post_pic where post_id=#{post_id} and is_del=0
+		</select>
+	<insert id="addPostPic" parameterType="com.meisui.manage.entity.Post_Pic">
+		insert into t_post_pic (post_id,pic,sort,width,height,is_del) values (#{post_id},#{p_name},#{sort},#{width},#{height},0)
+	</insert>
+	<select id="getPostPicListBySpId" resultType="com.meisui.manage.entity.Post_Pic">
+		select id,post_id,pic,width,height,sort from t_post_pic where post_id=#{post_id} and is_del=0 order by sort asc
+	</select>
+		<update id="deletePic" parameterType="com.meisui.manage.entity.Post_Pic">
+		update t_post_pic set is_del=1 where id=#{id}
+	</update>
+	<update id="PostIsOnline"  parameterType="com.meisui.manage.entity.Post">
+	update t_post set is_online = #{is_online} ,w_name=#{w_name},update_time=#{update_time} where id=#{id}
+	</update>
+	<update id="PostDelete"  parameterType="com.meisui.manage.entity.Post">
+	update t_post set is_del=1,w_name = #{w_name}, update_time = #{update_time} where id= #{id}
+	</update>
+	<select id="getPostCommentList" resultType="com.meisui.manage.entity.Post_Comment">
+	select id,post_id,uid,comment,zan_count,create_time,update_time,w_name,is_top from t_post_comment where is_del = 0 and post_id=#{post_id}
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="comment !=null and comment !=''">
+			and comment like "%"#{comment}"%"
+			</if>
+			<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname =  #{nickname})
+			</if>
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and create_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and create_time < #{end_time}]]>
+			</if>
+		order by is_top desc,create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getPostCommentRecordCount" resultType="Integer">
+	select count(1) from t_post_comment where is_del = 0 and post_id=#{post_id}
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="comment !=null and comment !=''">
+			and comment like "%"#{comment}"%"
+			</if>
+			<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname =  #{nickname})
+			</if>
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and create_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and create_time < #{end_time}]]>
+			</if>
+	</select>
+	<update id="CommentDelete" parameterType="com.meisui.manage.entity.Post_Comment">
+	update t_post_comment set is_del=1,w_name = #{w_name}, update_time = #{update_time} where id= #{id}
+	</update>
+	<update id="topComment" parameterType="com.meisui.manage.entity.Post_Comment">
+	update t_post_comment set is_top=#{is_top},w_name = #{w_name}, update_time = #{update_time} where id= #{id}
+	</update>
+	<insert id="insertAddPicmanagerComment" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Post_Comment">
+	insert into t_post_comment (post_id,uid,comment,zan_count,create_time,w_name,is_top,is_del,update_time) values (#{post_id},#{uid},#{comment},#{zan_count},#{create_time},#{w_name},#{is_top},0,#{update_time})
+	</insert>
+	<insert id="insertVideoManager" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Post">
+		INSERT INTO t_post (
+		type,uid,title,zan_count,share_count,video_height,video_width,video,create_time,is_del,is_online,w_name,update_time,tag_id)
+		VALUES
+		(#{type},#{uid},#{title},#{zan_count},#{share_count},#{video_height},#{video_width},#{video},#{create_time},#{is_del},1,#{w_name},#{update_time},#{tag_id})
+	</insert>
+		<update id="updateVideoManager" parameterType="com.meisui.manage.entity.Post">
+		update t_post set
+		type=#{type},uid = #{uid},title = #{title},zan_count= #{zan_count},share_count=#{share_count},video_height=#{video_height},video_width=#{video_width},video=#{video},tag_id=#{tag_id},
+		update_time=#{update_time},w_name=#{w_name} where id = #{id}
+		</update>
+		<select id="getPostPicSortBypostId" resultType="com.meisui.manage.entity.Post_Pic">
+		select max(sort) as maxsort from t_post_pic where post_id=#{post_id} and is_del=0
+		</select>
+		<select id="getcommunityrecommendbyuid" resultType="Integer">
+		select count(id) from t_community_recommend where uid = #{uid} and is_del=0 and type=#{type}
+		</select>
+		<select id="getPostCommentManagerList" resultType="com.meisui.manage.entity.Post_Comment">
+		select id,post_id,uid,comment,zan_count,create_time,update_time,w_name,is_top from t_post_comment where is_del = 0 
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="comment !=null and comment !=''">
+			and comment like "%"#{comment}"%"
+			</if>
+			<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname =  #{nickname})
+			</if>
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and create_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and create_time < #{end_time}]]>
+			</if>
+		order by create_time desc limit #{offset},#{rows}
+		</select>
+		<select id="getPostCommentManagerRecordCount" resultType="Integer">
+		select count(1) from t_post_comment where is_del = 0 
+			<if test="uid >0">
+			and uid = #{uid}
+			</if>
+			<if test="comment !=null and comment !=''">
+			and comment like "%"#{comment}"%"
+			</if>
+			<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname =  #{nickname})
+			</if>
+			<if test="start_time != null and start_time != ''">
+				<![CDATA[ and create_time >= #{start_time}]]>
+			</if>
+			<if test="end_time != null and end_time != ''">
+				<![CDATA[ and create_time < #{end_time}]]>
+			</if>
+		</select>
+		<select id="getIstopexist" resultType="Integer">
+			select id from t_post_comment where post_id=#{post_id} and is_top = 1 and is_del=0 limit 1
+		</select>
+	<update id="updatePicSort">
+		update t_post_pic set sort=#{sort} where post_id=#{post_id} and pic=#{pic}
+	</update>
+	<update id="updateCommentCount">
+	update t_post set comment_count =#{count} where id = #{post_id}
+	</update>
+	<select id="getpostcomentByid" resultType="Integer">
+	select post_id from t_post_comment where id = #{id}
+	</select>
+	<select id="getTagList" resultType="com.meisui.manage.entity.Post_Tag">
+	select id , name,w_name,create_time,update_time from t_post_tag where is_del=0 
+			<if test="name !=null and name !=''">
+			and name like "%"#{name}"%"
+			</if>
+		order by create_time desc limit #{offset},#{rows}	
+	</select>
+	<select id="getTagRecordCount" resultType="Integer">
+	select count(1) from t_post_tag where is_del=0 
+			<if test="name !=null and name !=''">
+			and name like  "%"#{name}"%"
+			</if>
+	</select>
+	<select id="getPostTagByid" resultType="com.meisui.manage.entity.Post_Tag">
+	select id, name,w_name,create_time,update_time from t_post_tag where id = #{id}
+	</select>
+	<insert id="insertTagManager" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Post_Tag">
+	INSERT INTO t_post_tag (
+		`name`,is_del,w_name,create_time,update_time)
+		VALUES
+		(#{name},#{is_del},#{w_name},#{create_time},#{update_time})
+	</insert>
+	<update id="updateTagManager" parameterType="com.meisui.manage.entity.Post_Tag">
+	update t_post_tag set `name` = #{name} ,w_name = #{w_name},update_time = #{update_time} where id = #{id}
+	</update>
+	<update id="deleteTag" parameterType="com.meisui.manage.entity.Post_Tag">
+	update t_post_tag set is_del = 1 ,w_name = #{w_name},update_time = #{update_time} where id = #{id}
+	</update>
+	<select id="getPostTag" resultType="com.meisui.manage.entity.Post_Tag">
+	select id,name from t_post_tag where is_del=0
+	</select>
+	<select id="getPostCommentCount" resultType="Integer">
+	select count(id) from t_post_comment where post_id = #{post_id} and is_del=0 
+	</select>
+	<select id="getPostCount" resultType="Integer">
+	select count(id) from t_post where uid = #{uid} and is_del=0 and is_online=1
+	</select>
+	<update id="topPost" parameterType="com.meisui.manage.entity.Post">
+	update t_post set is_top=#{is_top},w_name = #{w_name} where id= #{id}
+	</update>
+</mapper>

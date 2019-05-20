@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IdialDao">
+	<select id="getDialList" resultType="com.meisui.manage.entity.Dial_Prize">
+		select
+		id,pic,type,gift_id,prize_count,probability,inventory,start_time,end_time,w_name,create_time,update_time
+		from t_dial_prize where is_del=0
+		order by create_time asc,id asc limit #{offset},#{rows}
+	</select>
+	<select id="getDialListCount" resultType="Integer">
+		select count(1) from t_dial_prize where is_del=0
+	</select>
+	<insert id="insertdialprize" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Dial_Prize">
+		insert into t_dial_prize
+		(type,gift_id,pic,prize_count,probability,inventory,start_time,end_time,is_del,w_name,create_time)
+		values(#{type},#{gift_id},#{pic},#{prize_count},#{probability},#{inventory},#{start_time},#{end_time},#{is_del},#{w_name},now())
+	</insert>
+	<select id="getDialPrize" resultType="com.meisui.manage.entity.Dial_Prize">
+		select
+		id,pic,type,gift_id,prize_count,probability,inventory,start_time,end_time,w_name,create_time,update_time
+		from t_dial_prize where id=#{id}
+	</select>
+	<update id="updatedialprize"
+		parameterType="com.meisui.manage.entity.Dial_Prize">
+		update t_dial_prize set
+		pic=#{pic},
+		prize_count=#{prize_count},
+		probability = #{probability},
+		inventory = #{inventory},
+		start_time = #{start_time},
+		end_time = #{end_time},
+		w_name = #{w_name},
+		update_time = #{update_time},
+		is_del = #{is_del}
+		where id = #{id}
+	</update>
+	<select id="getDialUserList" resultType="com.meisui.manage.entity.Dial_User">
+		select id,prize_id,uid,remark,create_time from t_dial_user 
+		<if test="uid>0">
+			where uid = #{uid}
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getDialUserListCount" resultType="Integer">
+		select count(1) from t_dial_user 
+		<if test="uid>0">
+			where uid = #{uid}
+		</if>
+	</select>
+	<update id="updatedialpic" parameterType="com.meisui.manage.entity.Dial_Prize">
+	update t_dial_prize set pic = #{pic} where gift_id = #{gift_id}
+	</update>
+</mapper>

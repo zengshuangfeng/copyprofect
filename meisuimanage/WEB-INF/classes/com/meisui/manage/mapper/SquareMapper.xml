@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IsquareDao">
+	<select id="getSquareList" resultType="com.meisui.manage.entity.Square">
+		select s.id,s.f_uuid,s.t,s.anchor_notice,s.watch_count,s.type,s.virtual_add_hots,s.hots,s.virtual_time,s.w_name,s.times,s.is_secret,u.id as uid,u.nickname from t_square s inner join t_user u on s.f_uuid=u.f_uuid
+		<if test="uid>0">
+		 and u.id=#{uid} 
+		</if>
+		<if test="type>-1 and type != 2">
+		 and s.type=#{type} 
+		</if>
+		<if test="type == 2">
+		 and s.is_secret = 1
+		</if>		
+		<if test="nickname != null and nickname != ''">
+		 and u.nickname like "%"#{nickname}"%"
+		</if>
+		<![CDATA[ order by (hots+if(virtual_time>#{date},virtual_add_hots,0)) desc,s.id desc ]]>
+		limit #{offset},#{rows}
+	</select>	
+	<select id="getSquareCount" resultType="Integer">
+		select count(1) from t_square s inner join t_user u on s.f_uuid=u.f_uuid
+		<if test="uid>0">
+		 and u.id=#{uid} 
+		</if>
+		<if test="type>-1 and type != 2">
+		 and s.type=#{type} 
+		</if>
+		<if test="type == 2">
+		 and s.is_secret = 1
+		</if>			
+		<if test="nickname != null and nickname != ''">
+		 and u.nickname like "%"#{nickname}"%"
+		</if>
+	</select>	
+	<update id="updateSquareVirtualHots">
+		update t_square set virtual_add_hots=#{virtual_add_hots},virtual_time=#{virtual_time},w_name=#{w_name} where id=#{id}
+	</update>
+	<update id="updateSquareVIP">
+		update t_square set is_vip=#{is_vip} where uid=#{uid}
+	</update>	
+	<select id="getSquareList2" resultType="com.meisui.manage.entity.Square">
+		select id,anchor_notice,f_uuid,uid,nickname,anchor_cover,times,is_vip from t_square 
+		<if test="f_uuid>0"> where f_uuid=#{f_uuid} </if>
+		<![CDATA[ order by (hots+if(virtual_time>#{date},virtual_add_hots,0)) desc,id desc ]]>
+		limit #{offset},#{rows}
+	</select>
+	<select id="getAllSquareList" resultType="com.meisui.manage.entity.Square">
+		select f_uuid,nickname from t_square 
+		<![CDATA[ order by (hots+if(virtual_time>#{date},virtual_add_hots,0)) desc,id desc ]]>
+	</select>
+	<select id="getSquareCount2" resultType="Integer">
+		select count(1) from t_square 
+		<if test="f_uuid>0"> where f_uuid=#{f_uuid} </if>
+	</select>
+	<select id="getSquareDomain" resultType="String">
+		select domain from t_square where f_uuid =#{f_uuid}
+	</select>
+	<select id="getTotalWatchCount" resultType="Integer">
+		select sum(watch_count) from t_square
+	</select>	
+	<update id="updateFee_count">
+	   update t_square set fee_count = #{fee_count},is_fee=#{is_fee},isupdate=#{isupdate} where uid = #{uid}
+	</update>
+	<select id="getSquare" resultType="com.meisui.manage.entity.Square">
+		select is_fee,fee_count from t_square where f_uuid=#{f_uuid} and uid=#{uid}
+	</select>
+	<delete id="deleteSquareFee">
+		<![CDATA[delete from t_square_fee where anchor_f_uuid=#{anchor_f_uuid}]]>
+	</delete>
+</mapper>

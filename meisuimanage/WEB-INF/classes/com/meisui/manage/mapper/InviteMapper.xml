@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IinviteDao">
+	<select id="getInviteList" resultType="com.meisui.manage.entity.Invite">
+		select id,content,virtual_count,to_virtual_count,effect_time,w_name,is_online from t_invite 
+		order by effect_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getInviteCount" resultType="Integer">
+		select count(1) from t_invite
+	</select>	
+	<select id="getInvite" resultType="com.meisui.manage.entity.Invite">
+		select id,content,virtual_count,to_virtual_count,effect_time,w_name,is_online from t_invite where id=#{id}
+	</select>
+	<insert id="insertInvite" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Invite">
+		insert into t_invite
+		(content,virtual_count,to_virtual_count,effect_time,is_online,w_name,create_time,update_time)
+		values(#{content},#{virtual_count},#{to_virtual_count},#{effect_time},#{is_online},#{w_name},#{create_time},#{update_time})
+	</insert>	
+	<update id="updateInvite" parameterType="com.meisui.manage.entity.Invite">
+		update t_invite set 
+		content=#{content},
+		virtual_count=#{virtual_count},
+		to_virtual_count=#{to_virtual_count},
+		is_online = #{is_online},
+		effect_time=#{effect_time},
+		create_time=#{create_time},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<update id="updateInviteOnline">
+		update t_invite set 
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+</mapper>

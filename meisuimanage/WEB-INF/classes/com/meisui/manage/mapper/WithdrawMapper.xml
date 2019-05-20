@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IwithdrawDao">
+	<select id="getWithdrawList" resultType="com.meisui.manage.entity.Withdraw">
+		select w.id,w.uid,w.create_time,w.is_pay,w.withdraw_type,w.withdraw_pass,w.withdraw_virtual,w.withdraw_rmb,w.name,w.remark,u.nickname from t_withdraw w left join t_user u on w.uid=u.id where 1=1  
+		<if test="is_pay>-1">
+		 and w.is_pay = #{is_pay}
+		</if>
+		<if test="uid>0">
+		 and w.uid = #{uid}
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and u.nickname like "%"#{nickname}"%" 
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getWithdrawCount" resultType="Integer">
+		select count(1) from t_withdraw w left join t_user u on w.uid=u.id where 1=1  
+		<if test="is_pay>-1">
+		 and w.is_pay = #{is_pay}
+		</if>
+		<if test="uid>0">
+		 and w.uid = #{uid}
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and u.nickname like "%"#{nickname}"%" 
+		</if>
+	</select>	
+	<update id="updateWithdraw" parameterType="com.meisui.manage.entity.Withdraw">
+		update t_withdraw set 
+		is_pay = #{is_pay},
+		update_time = #{update_time},
+		w_name = #{w_name}
+		where id = #{id}
+	</update>
+	<select id="getWithdrawVirtual" resultType="com.meisui.manage.entity.Withdraw">
+		select uid,withdraw_virtual from t_withdraw where id=#{id}
+	</select>	
+	<select id="getWithdrawListWithUid" resultType="com.meisui.manage.entity.Withdraw">
+		<![CDATA[select withdraw_virtual,withdraw_rmb,w_name,update_time from t_withdraw where uid=#{uid} and is_pay=1 and update_time>=#{date}]]>
+		order by update_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getWithdrawCountWithUid" resultType="Integer">
+		<![CDATA[select count(1) from t_withdraw where uid=#{uid} and is_pay=1 and update_time>=#{date}]]>
+	</select>	
+	<insert id="insertWithdraw" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Withdraw">
+		insert into t_withdraw(withdraw_type,withdraw_pass,withdraw_virtual,withdraw_rmb,`name`,uid,remark,create_time,update_time,w_name) values(#{withdraw_type},#{withdraw_pass},#{withdraw_virtual},#{withdraw_rmb},#{name},#{uid},#{remark},#{create_time},#{update_time},#{w_name})
+	</insert>
+</mapper>

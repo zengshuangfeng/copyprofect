@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.Ioperate_Center_SettlementDao">
+	<select id="getSettlementList" resultType="com.meisui.manage.entity.Operate_Center_Settlement">
+		select operate_center_id,settlement_type,start_time,end_time,virtual_count,divide,money_count,create_time from t_operate_center_settlement
+		<where>
+			<if test="operate_center_id>0">
+				operate_center_id=#{operate_center_id}
+			</if>
+			<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time>=#{s_time} ]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time<#{e_time} ]]>
+			</if>	
+		</where>
+		 order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getSettlementCount" resultType="Integer">
+		select count(1) from t_operate_center_settlement
+		<where>
+			<if test="operate_center_id>0">
+				operate_center_id=#{operate_center_id}
+			</if>
+			<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time>=#{s_time} ]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time<#{e_time} ]]>
+			</if>	
+		</where>
+	</select>
+	<select id="getHasSettlement" resultType="Integer">
+		select id from t_operate_center_settlement where operate_center_id=#{operate_center_id} and settlement_type=#{settlement_type} and start_time=#{start_time} and end_time=#{end_time}
+	</select>
+	<select id="getHasSettlementList" resultType="Integer">
+		select operate_center_id from t_operate_center_settlement where settlement_type=#{type} and start_time=#{start_time} and end_time=#{end_time}
+		<if test="operate_center_id>0">
+			and operate_center_id=#{operate_center_id}
+		</if>
+	</select>
+	<insert id="add" >
+		insert into t_operate_center_settlement 
+		(operate_center_id,settlement_type,start_time,end_time,virtual_count,divide,money_count,create_time,w_name) values
+		(#{operate_center_id},#{settlement_type},#{start_time},#{end_time},#{surplus_anchor_virtual},#{divide},#{money_count},#{date},#{w_name})
+	</insert>
+	<select id="getLastSettlementTime" resultType="java.util.Date">
+		select create_time from t_operate_center_settlement where operate_center_id=#{operate_center_id} and settlement_type=#{settlement_type}
+		 order by create_time desc limit 1
+	</select>
+	<select id="getHasSettlementOperateCenterId" resultType="Integer">
+		select operate_center_id from t_operate_center_settlement where settlement_type=#{settlement_type} and start_time=#{start_time} and end_time=#{end_time}
+	</select>
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.IadminDao">
+	<select id="getAdminByName" resultType="com.meisui.manage.entity.Admin">
+		select id,nickname,`group`,username,password,is_close,type,is_read,remark 
+		from t_admin where username = #{username} and is_read = 0
+	</select>
+	<select id="getAdminList" resultType="com.meisui.manage.entity.Admin">
+		select id,nickname,`group`,username,password,remark,is_read
+		from t_admin where id != 1 and id!= #{id} and type=0 
+		<!-- <if test="id>1">
+		  and `group` = 2 
+		</if> -->
+		<if test="keyword != null and keyword != ''">
+			and (username like "%"#{keyword}"%" or nickname like "%"#{keyword}"%")
+		</if>
+	</select>
+	<select id="getAdminById" resultType="com.meisui.manage.entity.Admin">
+		select id,`group`,nickname,username,password,is_read,remark
+		from t_admin where id = #{id}
+	</select>
+	<insert id="insertAdmin" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Admin">
+		insert into t_admin(`group`,nickname,username,password,remark,type,w_name,is_read) values(#{group},#{nickname},#{username},#{password},#{remark},#{type},#{w_name},#{is_read})
+	</insert>
+	<update id="updateAdmin" parameterType="com.meisui.manage.entity.Admin">
+		update t_admin set 
+		`group` = #{group},		
+		remark = #{remark},	
+		nickname = #{nickname},		
+		username = #{username},
+		is_read = #{is_read}
+		<if test="password !=null and password !=''">
+		,password = #{password}
+		</if>
+		where id = #{id}
+	</update>
+	<insert id="insertAdminPermission"  parameterType="com.meisui.manage.entity.Admin_Permission">
+		insert into t_admin_permission(admin_id,menu_id) 
+		values
+		<foreach collection="list" index="index" item="item"
+			separator=",">			
+			(#{admin_id},#{item})
+		</foreach>
+	</insert>
+	<delete id="deleteAdmin">
+		delete from t_admin where id = #{id}
+	</delete>
+	<delete id="deleteAdminPermission">
+		delete from t_admin_permission where admin_id = #{admin_id}
+	</delete>
+	<update id="resetPwd" parameterType="com.meisui.manage.entity.Admin">
+		update t_admin set 	
+		password = #{password}
+		where id = #{id}
+	</update>
+	<select id="getAdminByNickname" resultType="Integer">
+		select id
+		from t_admin where nickname = #{nickname} order by id desc limit 1
+	</select>
+	<select id="getAdminByUsername" resultType="Integer">
+		select id
+		from t_admin where username = #{username}
+	</select>
+		<select id="getMenuId" resultType="Integer">
+		select menu_id
+		from t_admin_permission where admin_id = #{admin_id}  
+	</select>
+	<select id="getVideoAdminList" resultType="com.meisui.manage.entity.Admin">
+		select id,nickname,username,password,is_close,video_count,w_name 
+		from t_admin where id != 1 and id!= #{id} and type=1 
+		<if test="nickname != null and nickname != ''">
+			and nickname like "%"#{nickname}"%" 
+		</if>
+		 order by id desc limit #{offset},#{rows}
+	</select>
+	<select id="getVideoAdminCount" resultType="Integer">
+		select count(1)
+		from t_admin where id != 1 and id!= #{id} and type=1 
+		<if test="nickname != null and nickname != ''">
+			and nickname like "%"#{nickname}"%" 
+		</if>
+	</select>
+	<update id="updateAdminClose">
+		update t_admin set 	
+		is_close = #{is_close},
+		w_name=#{w_name}  
+		where id = #{id}
+	</update>
+	<update id="updateAdminVideoCount">
+		update t_admin set 	
+		video_count = video_count + #{add}  
+		where id = #{id}
+	</update>
+	<select id="getALLAdminList" resultType="String">
+		select nickname from t_admin 
+	</select>
+	<select id="getAdminByGoup" resultType="com.meisui.manage.entity.Admin">
+		select id from t_admin where `group` = 0 and is_read = 0
+	</select>
+</mapper>  

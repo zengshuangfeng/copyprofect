@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iuser_ForbidDao">
+	<select id="getUserForbidList" resultType="com.meisui.manage.entity.User_Forbid">
+		select f.uid,u.nickname,f.update_time from t_user_forbid f,t_user u where f.uid=u.id and f.f_uuid = #{f_uuid} and f.is_del = 0
+		order by update_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getUserForbidCount" resultType="Integer">
+		select count(1) from t_user_forbid where f_uuid = #{f_uuid} 
+	</select>	
+</mapper>

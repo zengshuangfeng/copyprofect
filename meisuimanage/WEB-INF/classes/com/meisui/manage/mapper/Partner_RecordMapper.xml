@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ipartner_RecordDao">
+	<select id="getWaringCount" resultType="Integer">
+		select count(1) from t_partner_record where type=0 and uid=#{uid} and create_time>=DATE_SUB(NOW(),INTERVAL #{time} MINUTE)
+	</select>	
+	<insert id="insertPartnerRecord"  useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Partner_Record">
+	 insert into t_partner_record(uid,f_uuid,anchor_name,reason,create_time,pic,w_name,type) values(#{uid},#{f_uuid},#{anchor_name},#{reason},#{create_time},#{pic},#{w_name},#{type})
+	</insert>
+	<update id="updatePartnerRecord" parameterType="com.meisui.manage.entity.Partner_Record">
+		update t_partner_record set reason=#{reason},pic=#{pic},w_name=#{w_name}  where id=#{id}
+	</update>
+	<select id="getLastWaring" resultType="com.meisui.manage.entity.Partner_Record">
+		select create_time from t_partner_record where type=0 and uid=#{uid} and f_uuid=#{f_uuid} order by create_time desc limit 1
+	</select>
+	<select id="getPartnerRecordList" resultType="com.meisui.manage.entity.Partner_Record">
+		select id,uid,f_uuid,anchor_name,reason,pic,w_name,create_time from t_partner_record where type=#{type} 
+		<if test="uid>0">
+		 and uid=#{uid} 
+		</if>
+		<if test="f_uuid>0">
+		 and f_uuid=#{f_uuid} 
+		</if>
+		<if test="w_name != null and w_name !=''">
+		 and w_name=#{w_name}
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getPartnerRecordCount" resultType="Integer">
+		select count(1) from t_partner_record where type=#{type} 
+		<if test="uid>0">
+		 and uid=#{uid} 
+		</if>
+		<if test="f_uuid>0">
+		 and f_uuid=#{f_uuid} 
+		</if>
+		<if test="w_name != null and w_name !=''">
+		 and w_name=#{w_name}
+		</if>
+	</select>
+</mapper>

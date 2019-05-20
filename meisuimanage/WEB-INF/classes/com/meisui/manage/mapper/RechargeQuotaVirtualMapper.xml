@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IRechargeQuotaDao">
+	
+	<insert id="insertRecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Recharge_Quota_Virtual">
+		insert into t_recharge_quota_virtual
+		(operate_center_id,rechargequota,create_time,w_name,remark)
+		values 
+		(#{operate_center_id},#{rechargequota},#{create_time},#{w_name},#{remark})
+	</insert>
+	
+	<select id="totalVirtualCount" resultType="Long">
+	select ifnull(sum(virtual_count),0) from t_recharge_virtual where operate_center_id=#{centerid}	
+	</select>
+	<select id="getRechargeQuotaVirtualList" resultType="com.meisui.manage.entity.Recharge_Quota_Virtual">
+	select id , operate_center_id,rechargequota,create_time,w_name,remark from t_recharge_quota_virtual
+	 where 1=1
+	 <if test="centerId>0">
+		and operate_center_id=#{centerId}
+	 </if>
+	 
+		<if test="b_time!=''">
+			<![CDATA[and create_time>=#{b_time}]]>
+		</if>
+		<if test="e_time!=''">
+			<![CDATA[and create_time<=#{e_time}]]>
+		</if>
+	order by create_time desc
+	limit #{offset},#{rows}
+	</select>
+	<select id="getRechargeQuotaVirtualListCount" resultType="Integer">
+		select count(1) from t_recharge_quota_virtual  
+		where 1=1
+	 <if test="centerId>0">
+		and operate_center_id=#{centerId}
+	 </if>
+		<if test="b_time!=''">
+			<![CDATA[and create_time>=#{b_time}]]>
+		</if>
+		<if test="e_time!=''">
+			<![CDATA[and create_time<=#{e_time}]]>
+		</if>
+	</select>	
+</mapper>

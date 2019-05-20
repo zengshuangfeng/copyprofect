@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Igameroom_RecordDao">
+	<select id="getGameroomRecordTotalList" resultType="com.meisui.manage.entity.Gameroom_Record_Total">
+		select r.id,r.uid,r.f_uuid,r.t,r.total_bet_count,r.current_bet_count,r.total_user_count,r.current_user_count,r.max_bet_count,r.current_percent,r.current_virtual_count,r.create_time,r.is_intervene,s.id as s_id from t_gameroom_record_total r left join t_square s on r.f_uuid=s.f_uuid where 1=1
+		<if test="start_time != null">
+		<![CDATA[ and r.create_time=#{start_time} ]]>
+		</if>
+		<if test="anchor_state>-1">
+			and s.id is not null 
+		</if>
+		ORDER BY r.create_time desc,r.id desc limit #{offset},#{rows}
+	</select>	
+	<select id="getGameroomRecordTotalCount" resultType="Integer">
+		select count(1) from t_gameroom_record_total where 1=1
+		<if test="start_time != null">
+		<![CDATA[ and create_time=#{start_time} ]]>
+		</if>
+	</select>
+	<update id="updateGameroomRecordTotalIntervene">
+		update t_gameroom_record_total set 
+		is_intervene = 1
+		where id = #{id}
+	</update>
+	<select id="getGameroomRecordListWithF_uuid" resultType="com.meisui.manage.entity.Gameroom_Record">
+		select id,current_bet_count,current_user_count,max_bet_count,current_percent,current_virtual_count,create_time,end_time,is_intervene from t_gameroom_record where f_uuid=#{f_uuid} 
+		<if test="start_time != null">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+		ORDER BY create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getGameroomRecordCountWithF_uuid" resultType="Integer">
+		select count(1) from t_gameroom_record where f_uuid=#{f_uuid}
+		<if test="start_time != null">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+	</select>
+	<select id="getTotalBetCountSum" resultType="Long">
+		select sum(total_bet_count) from t_gameroom_record_total where create_time=#{create_time} 
+	</select>	
+	<select id="getCurrentVirtualCountSum" resultType="Long">
+		select sum(current_virtual_count) from t_gameroom_record_total 
+	</select>	
+	<select id="getTotalBetCountSumWithF_uuid" resultType="Long">
+		select total_bet_count from t_gameroom_record_total where f_uuid=#{f_uuid} and create_time=#{create_time} 
+	</select>	
+	<select id="getCurrentVirtualCountSumWithF_uuid" resultType="Long">
+		select current_virtual_count from t_gameroom_record_total where f_uuid=#{f_uuid} and create_time=#{create_time} 
+	</select>	
+</mapper>

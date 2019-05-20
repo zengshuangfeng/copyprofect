@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ih5Dao">
+	<select id="getH5List" resultType="com.meisui.manage.entity.H5">
+		select id,title,content,banner,w_name,create_time from t_h5 
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getH5Count" resultType="Integer">
+		select count(1) from t_h5
+	</select>	
+	<insert id="insertH5" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.H5">
+		insert into t_h5
+		(title,content,banner,author,w_name,create_time,update_time)
+		values(#{title},#{content},#{banner},#{author},#{w_name},#{create_time},#{update_time})
+	</insert>	
+	<update id="updateH5" parameterType="com.meisui.manage.entity.H5">
+		update t_h5 set 
+		title=#{title},
+		banner=#{banner},
+		content=#{content},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<select id="getH5" resultType="com.meisui.manage.entity.H5">
+		select *
+		from t_h5 where id = #{id}
+	</select>
+</mapper>

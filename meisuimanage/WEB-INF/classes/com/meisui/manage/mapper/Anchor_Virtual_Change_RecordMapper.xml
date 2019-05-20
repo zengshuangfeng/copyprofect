@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_Virtual_Change_RecordDao">
+	<select id="getAnchorVirtualChangeRecordList" resultType="com.meisui.manage.entity.Anchor_Virtual_Change_Record">
+		select id,uid,total_anchor_virtual,surplus_anchor_virtual,total_change_virtual,change_virtual,remark,create_time 
+		from t_anchor_virtual_change_record where uid=#{uid} 
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getAnchorVirtualChangeRecordCount" resultType="Integer">
+		select count(1) from t_anchor_virtual_change_record where uid=#{uid} 
+	</select>	
+	<insert id="insertAnchorVirtualChangeRecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Virtual_Change_Record">
+		insert into t_anchor_virtual_change_record
+		(uid,total_anchor_virtual,surplus_anchor_virtual,total_change_virtual,change_virtual,remark,create_time,w_name)
+		values(#{uid},#{total_anchor_virtual},#{surplus_anchor_virtual},#{total_change_virtual},#{change_virtual},#{remark},#{create_time},#{w_name})
+	</insert>	
+	<select id="getAnchorVirtualChangeSum" resultType="Long">
+		select sum(change_virtual) from t_anchor_virtual_change_record where uid=#{uid} 
+	</select>
+	<select id="getAnchorVirtualChangeRecordList2" resultType="com.meisui.manage.entity.Anchor_Virtual_Change_Record">
+		select uid,change_virtual,remark,create_time,total_anchor_virtual,surplus_anchor_virtual,total_change_virtual
+		from t_anchor_virtual_change_record
+		<![CDATA[ where create_time>=#{create_time} ]]>
+	
+		 order by create_time asc
+	</select>
+</mapper>

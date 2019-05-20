@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IattentionDao">
+	<select id="getAttentionList" resultType="com.meisui.manage.entity.Attention">
+		select a.uid,a.create_time,u.nickname from t_attention a inner join t_user u on a.uid=u.id where a.attention_uid = #{attention_uid} and a.is_attention =1   
+		order by a.create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getAttentionCount" resultType="Integer">
+		select count(1) from t_attention where attention_uid = #{attention_uid} and is_attention =1
+	</select>	
+	<select id="getAttentionListWithUid" resultType="com.meisui.manage.entity.Attention">
+		select a.attention_uid,a.create_time,u.nickname as attention_nickname,a.is_attention from t_attention a inner join t_user u on a.attention_uid=u.id where a.uid = #{uid}   
+		order by a.create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getAttentionCountWithUid" resultType="Integer">
+		select count(1) from t_attention where uid = #{uid}
+	</select>	
+</mapper>

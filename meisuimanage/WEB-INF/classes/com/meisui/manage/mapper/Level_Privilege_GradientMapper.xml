@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ilevel_Privilege_GradientDao">
+	<select id="getLevelPrivilegeGradientList" resultType="com.meisui.manage.entity.Level_Privilege_Gradient">
+		select id,name,is_online,`level`,virtual_count,w_name,update_time from t_level_privilege_gradient where p_id=#{p_id} and is_del=0
+		order by level asc limit #{offset},#{rows}
+	</select>	
+	<select id="getLevelPrivilegeGradientCount" resultType="Integer">
+		select count(1) from t_level_privilege_gradient where p_id=#{p_id} and is_del=0
+	</select>		
+	<insert id="insertLevelPrivilegeGradient" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Level_Privilege_Gradient">
+		insert into t_level_privilege_gradient
+		(p_id,name,`level`,is_online,virtual_count,w_name,create_time,update_time) 
+		values(#{p_id},#{name},#{level},#{virtual_count},#{is_online},#{w_name},#{create_time},#{update_time})
+	</insert>	
+	<update id="updateLevelPrivilegeGradient" parameterType="com.meisui.manage.entity.Level_Privilege_Gradient">
+		update t_level_privilege_gradient set 
+		`level` = #{level},
+		name = #{name},
+		virtual_count=#{virtual_count},
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<update id="deleteLevelPrivilegeGradient">
+		update t_level_privilege_gradient set 
+		is_del = 1,
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<select id="getLevelPrivilegeGradient" resultType="com.meisui.manage.entity.Level_Privilege_Gradient">
+		select *
+		from t_level_privilege_gradient where id = #{id}
+	</select>
+</mapper>

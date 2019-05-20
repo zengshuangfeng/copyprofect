@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ibalance_VirtualrecordDao">
+	<insert id="insertBalance_Virtualrecord" useGeneratedKeys="true">
+		insert into balance_virtualrecord(`uid`,`balance_virtual`,balance_money, `diamondsb`, `diamondsa`, `remark`,`w_name`,`create_date`,nickname)
+		values(#{uid},#{balance_virtual}, #{balance_money},#{diamondsb}, #{diamondsa}, #{remark},#{w_name},#{create_date},#{nickname})
+	</insert>	
+	
+</mapper>
+
+ 
+  
+  
+  
+   

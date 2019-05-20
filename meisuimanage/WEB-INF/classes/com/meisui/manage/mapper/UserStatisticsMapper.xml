@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IuserStatisticsDao">
+	<select id="getUserInfo" resultType="hashmap">
+	  select id as uid,nickname,f_uuid,level,channel,balance_virtual,register_time as registerTime from t_user
+	  where id in (SELECT DISTINCT uid FROM t_spending WHERE create_time BETWEEN #{startTime} AND #{endTime})
+	  <if test="uid>0">and id=#{uid}</if>
+	  <if test="fuuid>0">and f_uuid=#{fuuid}</if>
+	  <if test="nickName!=''">and nickname=#{nickName}</if>
+	  <if test="startLevel>0"><![CDATA[ and `level`>=#{startLevel} and `level`<=#{endLevel} ]]></if>
+	  order by register_time desc LIMIT #{page},#{rows}
+	</select>
+		
+	<select id="getSumVirtual" resultType="Long">
+	  select sum(spending_virtual) as spending_virtual from t_spending where uid=#{uid} 
+	  <if test="startTime !='' and endTime !=''">
+	  and create_time between #{startTime} and #{endTime}
+	  </if>
+	</select>
+	<select id="getUserStake" resultType="Long">
+	  select sum(stake) as totalStake from t_user_stake where uid=#{uid} and create_time between #{startTime} and #{endTime}
+	</select>
+	<select id="getUserInfoCount" resultType="Integer">
+	  select count(1) from t_user
+	  where id in (SELECT DISTINCT uid FROM t_spending WHERE create_time BETWEEN #{startTime} AND #{endTime})
+	  <if test="uid>0">and id=#{uid}</if>
+	  <if test="fuuid>0">and f_uuid=#{fuuid}</if>
+	  <if test="nickName!=''">and nickname=#{nickName}</if>
+	  <if test="startLevel>0"><![CDATA[ and `level`>=#{startLevel} and `level`<=#{endLevel} ]]></if>
+	</select>
+	<select id="getExportExcelList" resultType="hashmap">
+	  select a.uid,SUM(spending_virtual) as total_spending,b.f_uuid,b.`level`,b.nickname,b.register_time,b.balance_virtual,b.channel from t_spending a
+	  left join t_user b on a.uid=b.id
+	  where a.create_time between #{startTime} and #{endTime}
+	  <if test="uid>0">and a.uid=#{uid}</if>
+	  <if test="fuuid>0">and b.f_uuid=#{fuuid}</if>
+	  <if test="nickName!=''">and b.nickname=#{nickName}</if>
+	  <if test="startLevel>0"><![CDATA[ and b.`level`>=#{startLevel} and b.`level`<=#{endLevel} ]]></if>
+	  GROUP BY uid order by total_spending desc
+	  limit 100
+	</select>
+</mapper>

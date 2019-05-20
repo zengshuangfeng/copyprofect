@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ilevel_ScoreDao">
+	<select id="getLevelScoreList" resultType="com.meisui.manage.entity.Level_Score">
+		select id,`level`,`name`,score,icon,is_online,w_name,update_time from t_level_score 
+		order by level asc limit #{offset},#{rows}
+	</select>	
+	<select id="getLevelScoreCount" resultType="Integer">
+		select count(1) from t_level_score
+	</select>	
+	<insert id="insertLevelScore" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Level_Score">
+		insert into t_level_score
+		(`level`,`name`,score,icon,color,is_online,w_name,create_time,update_time)
+		values(#{level},#{name},#{score},#{icon},#{color},#{is_online},#{w_name},#{create_time},#{update_time})
+	</insert>	
+	<update id="updateLevelScore" parameterType="com.meisui.manage.entity.Level_Score">
+		update t_level_score set 
+		`level` = #{level},
+		`name` = #{name},
+		score = #{score},
+		icon = #{icon},
+		color = #{color},
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<delete id="deleteLevelScore">
+		update t_level_score set is_del = 1,update_time=#{update_time},w_name = #{w_name} where id = #{id}
+	</delete>
+	<select id="getLevelScore" resultType="com.meisui.manage.entity.Level_Score">
+		select *
+		from t_level_score where id = #{id}
+	</select>
+</mapper>

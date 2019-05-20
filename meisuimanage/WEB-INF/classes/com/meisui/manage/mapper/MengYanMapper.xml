@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.ImengYanDao">
+	<select id="getMengYanList" resultType="com.meisui.manage.entity.MengYan">
+	select id,pic,type,sort,w_name,create_time,update_time from t_mengyan where is_del=0
+			<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time >= #{s_time}]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+			</if>
+			order by sort desc,create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getMengYanListCount" resultType="Integer">
+	select count(1) from t_mengyan where is_del=0
+		<if test="s_time != null and s_time != ''">
+				<![CDATA[ and create_time >= #{s_time}]]>
+			</if>
+			<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+			</if>
+	</select>
+	<insert id="insertmengyan" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.MengYan">
+		insert into t_mengyan
+		(pic,type,sort,w_name,create_time,is_del)
+		values(#{pic},#{type},#{sort},#{w_name},#{create_time},#{is_del})
+	</insert>	
+		<update id="updatemengyan" parameterType="com.meisui.manage.entity.MengYan">
+		update t_mengyan set 
+		pic=#{pic},
+		type=#{type},
+		sort=#{sort},
+		w_name=#{w_name},
+		update_time = #{update_time},
+		is_del = #{is_del}
+		where id = #{id}
+	</update>
+	<select id="getMengYan" resultType="com.meisui.manage.entity.MengYan">
+	select id,pic,type,sort,w_name,create_time,update_time from t_mengyan where id=#{id}
+	</select>
+	<update id="deleteMengyan">
+	update t_mengyan set is_del=1 where id = #{id}
+	</update>
+</mapper>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_TimeDao">
+	<select id="getAnchorTimeList" resultType="com.meisui.manage.entity.Anchor_Time">
+		<![CDATA[select start_time,end_time from t_anchor_time where uid = #{uid} and is_secret = 0 and type = #{type} and ((start_time >= #{start_date} and start_time < #{end_date}) or (start_time < #{start_date} and end_time > #{start_date})) ]]>
+		order by start_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getAnchorTimeCount" resultType="Integer">
+		<![CDATA[ select count(1) from t_anchor_time where uid = #{uid} and is_secret = 0 and type = #{type} and start_time >= #{date} ]]>
+	</select>
+	<select id="getAnchorTimeListWithTime" resultType="com.meisui.manage.entity.Anchor_Time">
+		<![CDATA[select start_time,end_time from t_anchor_time where uid = #{uid}  and is_secret = 0 and start_time >= #{start_date} and start_time < #{end_date} ]]>
+	</select>
+	<select id="getAnchorTimeWithTime" resultType="java.util.Date">
+		<![CDATA[select end_time from t_anchor_time where uid = #{uid}  and is_secret = 0 and start_time < #{end_date} order by start_time desc limit 1 ]]>
+	</select>
+	<select id="getAnchorTimeListWithDate" resultType="com.meisui.manage.entity.Anchor_Time">
+		<![CDATA[select uid,start_time,end_time from t_anchor_time where start_time >= #{start_date} and is_secret = 0 and start_time < #{end_date} ]]>
+		order by uid asc, start_time asc 
+	</select>
+	<select id="getAnchorTimeList2" resultType="com.meisui.manage.entity.Anchor_Time">
+		<![CDATA[select start_time,end_time from t_anchor_time where uid = #{uid} and is_secret = 0 and type = #{type} and ((start_time >= #{start_date} and start_time < #{end_date}) or (start_time < #{start_date} and end_time > #{start_date})) ]]>
+		order by start_time asc
+	</select>
+	<select id="getFirstAnchorTime" resultType="com.meisui.manage.entity.Anchor_Time">
+		select start_time,end_time from t_anchor_time where uid = #{uid}  and is_secret = 0 and type = #{type} order by start_time asc limit 1
+	</select>
+	<select id="getAnchorsAdmissionTicketList" resultType="com.meisui.manage.entity.AdmissionTicket">
+	    SELECT t_usr.nickname,t_anchortime.uid,t_anchortime.start_time,t_anchortime.end_time,t_anchortime.fee_count from
+        (select nickname,id from t_user
+        
+        <where>
+            <if test="nickname!=null and nickname!=''">
+                nickname = #{nickname}
+            </if>
+            <if test="uid!=null">
+                id = #{uid}
+            </if>       
+        </where>
+ 
+        )as t_usr  INNER JOIN (SELECT uid,start_time,end_time,fee_count from t_anchor_time
+        
+        <where>
+            <![CDATA[fee_count>0 and is_secret = 0]]>
+            <if test="start_time!=null and end_time!=null">
+              and <![CDATA[start_time>=#{start_time} and end_time<=#{end_time}]]>
+            </if>
+        </where>
+          
+        )as t_anchortime ON t_anchortime.uid = t_usr.id limit #{offset},#{rows}
+	</select>
+	<select id="getAnchorsAdmissionTicketCount" resultType="Integer">
+	    SELECT count(1) from
+        (select nickname,id from t_user
+        
+        <where>
+            <if test="nickname!=null and nickname!=''">
+                nickname = #{nickname}
+            </if>
+            <if test="uid!=null">
+                id = #{uid}
+            </if>       
+        </where>
+ 
+        )as t_usr  INNER JOIN (SELECT uid,start_time,end_time,fee_count from t_anchor_time
+        
+        <where>
+            <![CDATA[fee_count>0 and is_secret = 0]]>
+            <if test="start_time!=null and end_time!=null">
+             and <![CDATA[start_time>=#{start_time} and end_time<=#{end_time}]]>
+            </if>
+        </where>
+          
+        )as t_anchortime ON t_anchortime.uid = t_usr.id;
+	</select>
+	<update id="updateFee_count">
+	     update t_anchor_time set fee_count=#{fee_count} where uid = #{uid}
+	</update>	
+</mapper>

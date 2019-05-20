@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.AuthenticationDao">
+	<select id="getAuthenticationList" resultType="com.meisui.manage.entity.Authentication">
+		SELECT au.id,au.province_id,au.operate_center_id,au.agent_id,au.`name`,au.company_address,au.account_open_number,au.account_name,au.is_status,au.create_time,
+		DATE_FORMAT(au.update_time,'%Y-%m-%d %H:%i:%s') as update_time ,ar.pay_type,tg.`name` as agent_name,op.province_center_id,op.`name` as center_name,tc.`name` as province_name
+		FROM t_authentication au 
+		LEFT JOIN t_account_receivable ar on ar.authentication_id=au.id 
+		LEFT JOIN t_agent tg ON tg.id=au.agent_id
+		LEFT JOIN t_operate_center op ON op.id=au.operate_center_id
+		LEFT JOIN t_province_center tc ON tc.id=au.province_id order by au.create_time desc limit #{offset},#{rows}
+	 </select>
+	 <select id="getAuthenticationCount" resultType="Integer">
+		select count(1) from t_authentication 
+	</select>	
+	<select id="getAuthentication" resultType="com.meisui.manage.entity.Authentication">
+		select id,name,agent_id,operate_center_id,province_id,phone,email,company,company_address,company_reg_address,business_number,business_license_deadtime,account_open_number,account_name,
+		bank_card,bank_of_deposit,account_opening_branch,business_license,account_opening_license,corporate_id_card,other,is_status,create_time
+		 from t_authentication where id=#{id} 
+	 </select>
+	 <update id="checkPass" parameterType="com.meisui.manage.entity.Authentication">
+		 update t_authentication set is_status=#{1} where id=#{0}
+	 </update>
+</mapper>

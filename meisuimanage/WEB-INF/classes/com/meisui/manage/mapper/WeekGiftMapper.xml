@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IWeekGiftDao">
+		<select id="getWeekGiftList" resultType="com.meisui.manage.entity.Week_Gift">
+			select id,gift_id,gift_head,sort,w_name,create_time,update_time,is_online,online_time from t_week_gift where is_del=0
+			<if test="gift_id >0">
+			and gift_id = #{gift_id}
+			</if>
+			<if test="gift_name !=null and gift_name !=''">
+				and gift_id in (select id from t_gift_info where gift_name like "%"#{gift_name}"%")
+			</if>
+			order by sort desc,create_time desc limit #{offset},#{rows}
+		</select>
+		<select id="getWeekGiftCount" resultType="Integer">
+			select count(1) from t_week_gift where is_del=0
+			<if test="gift_id >0">
+				and gift_id = #{gift_id}
+			</if>
+			<if test="gift_name !=null and gift_name !=''">
+				and gift_id in (select id from t_gift_info where gift_name like "%"#{gift_name}"%")
+			</if>
+		</select>
+		<update id="deleteWeekGift">
+		update t_week_gift set 
+		is_del = 1,
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+	<select id="getWeekGift" resultType="com.meisui.manage.entity.Week_Gift">
+		select id,gift_id,gift_head,sort,w_name,create_time,update_time,is_online,online_time from t_week_gift where id=#{id}
+	</select>
+	
+		<insert id="inserweekgift" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Week_Gift">
+		insert into t_week_gift
+		(gift_id,gift_head,sort,is_del,w_name,create_time,is_online,online_time)
+		values(#{gift_id},#{gift_head},#{sort},0,#{w_name},#{create_time},#{is_online},#{online_time})
+	</insert>	
+		<update id="updateweekgift" parameterType="com.meisui.manage.entity.Week_Gift">
+		update t_week_gift set 
+		sort=#{sort},
+		w_name=#{w_name},
+		is_online=#{is_online},
+		update_time = #{update_time},
+		is_del = 0
+		where id = #{id}
+	</update>
+</mapper>

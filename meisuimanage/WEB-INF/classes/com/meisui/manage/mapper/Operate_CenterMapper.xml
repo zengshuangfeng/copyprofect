@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ioperate_CenterDao">
+	<select id="getList" resultType="com.meisui.manage.entity.Operate_Center">
+		select id,name,divide,remark,create_time,is_forbid,settlement_type,recharge_quota,province_center_id from t_operate_center where id>0
+		<if test="province_center_id > 0">
+		and province_center_id=#{province_center_id}
+		</if>
+		order by create_time desc 
+		limit #{offset},#{rows}
+	</select>
+	<select id="getoperateName" resultType="com.meisui.manage.entity.Operate_Center">
+	select name,divide from t_operate_center where is_forbid=0 and id= #{operateid}	
+	</select>
+	<select id="getListCount" resultType="Integer">
+		select count(1) from t_operate_center where id>0
+		<if test="province_center_id > 0">
+		and province_center_id=#{province_center_id}
+		</if>
+	</select>
+	<insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Operate_Center">
+		insert into t_operate_center 
+		(name,divide,settlement_type,username,password,contact,card_name,card_no,card_bank,province,city,company,create_time,w_name,remark,province_center_id)
+		values
+		(#{name},#{divide},#{settlement_type},#{username},#{password},#{contact},#{card_name},#{card_no},#{card_bank},#{province},#{city},#{company},#{create_time},#{w_name},#{remark},#{province_center_id})
+	</insert>
+	<select id="getOperateCenterById" resultType="com.meisui.manage.entity.Operate_Center">
+		select id,name,divide,remark,username,password,nickname,contact,card_name,card_no,card_bank,province,city,company,settlement_type,create_time,recharge_quota,province_center_id from t_operate_center where id=#{centerId}
+	</select>
+	<update id="update">
+		update t_operate_center set
+		name=#{name},
+		divide=#{divide},
+		username=#{username},
+		<if test="password!='' and password!=null">
+			password=#{password},
+		</if>
+		contact=#{contact},
+		card_name=#{card_name},
+		card_no=#{card_no},
+		card_bank=#{card_bank},
+		province=#{province},
+		city=#{city},
+		company=#{company},
+		update_time=#{update_time},
+		remark=#{remark},
+		province_center_id=#{province_center_id},
+		w_name=#{w_name}
+		where id=#{id}
+	</update>
+	<update id="updateRecharge">
+		update t_operate_center set recharge_quota =recharge_quota+#{virtual_count} where id=#{centerid}
+	</update>
+	<select id="getPasswordByCenterId" resultType="String">
+		select password from t_operate_center where id=#{centerId}
+	</select>
+	<select id="getListAll" resultType="com.meisui.manage.entity.Operate_Center">
+		select id,nickname,divide,remark,create_time,name from t_operate_center where is_forbid=0
+		order by create_time desc 
+	</select>
+	<select id="getListAllByprovinceid" resultType="com.meisui.manage.entity.Operate_Center">
+		select id,nickname,divide,remark,create_time,name,province_center_id from t_operate_center where is_forbid=0 and province_center_id=#{province_center_id}
+		order by create_time desc 
+	</select>
+	<select id="getOperateCenter" resultType="com.meisui.manage.entity.Operate_Center">
+	select id,name from t_operate_center
+	</select>
+	<update id="updateIsForbid">
+		update t_operate_center set is_forbid=#{is_forbid} where id=#{id}
+	</update>
+	<select id="getList2" resultType="com.meisui.manage.entity.Operate_Center">
+		select id,name,settlement_type,divide from t_operate_center where is_forbid=0 and settlement_type=#{type}
+		<if test="centerId>0">
+			and id=#{centerId}
+		</if>
+		<if test="settlement_id_list.size()>0">
+			and id not in 
+			<foreach collection="settlement_id_list" item="s_id" open="(" separator="," close=")">
+				#{s_id}
+			</foreach>
+		</if>
+		order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+	<select id="getListCount2" resultType="Integer">
+		select count(1) from t_operate_center where is_forbid=0 and settlement_type=#{type}
+		<if test="centerId>0">
+			and id=#{centerId}
+		</if>
+		<if test="settlement_id_list.size()>0">
+			and id not in 
+			<foreach collection="settlement_id_list" item="s_id" open="(" separator="," close=")">
+				#{s_id}
+			</foreach>
+		</if>
+	</select>
+	<select id="getList3" resultType="com.meisui.manage.entity.Operate_Center">
+		select id,name,settlement_type,divide from t_operate_center where is_forbid=0 and settlement_type=#{type}
+		<if test="centerId>0">
+			and id=#{centerId}
+		</if>
+		<if test="settlement_id_list.size()>0">
+			and id not in 
+			<foreach collection="settlement_id_list" item="s_id" open="(" separator="," close=")">
+				#{s_id}
+			</foreach>
+		</if>
+	</select>
+	<select id="getIdList" resultType="Integer">
+		select id from t_operate_center where settlement_type=#{settlement_type} 
+		<if test="id>0">
+		 and id=#{id}
+		</if>
+	</select>
+	<select id="getOperateUsernameExist" resultType="Integer">
+		select id from t_operate_center where username = #{username} and id != #{id}
+	</select>
+	<update id="updateRechargeQuota">
+		update t_operate_center set recharge_quota = recharge_quota + #{add} where id=#{id}
+	</update>
+	<select id="getProviceCenter" resultType="com.meisui.manage.entity.Province_Center">
+	select id,name from t_province_center where is_forbid=0 and id=#{province_center_id}
+	</select>
+		<select id="getProvinceListAll" resultType="com.meisui.manage.entity.Province_Center">
+	select id,name from t_province_center where is_forbid=0
+	</select>
+</mapper>

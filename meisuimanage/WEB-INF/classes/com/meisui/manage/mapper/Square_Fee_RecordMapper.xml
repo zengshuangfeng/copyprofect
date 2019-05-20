@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IsquareFeeRecordDao">
+   <insert id="insertSquareFeeRecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.SquareFeeRecord">
+        insert into t_square_fee_record(uid,f_uuid,nickname,start_time,fee_count,w_name,create_time) values(#{uid},#{f_uuid},#{nickname},#{start_time},#{fee_count},#{w_name},#{create_time})
+   </insert>
+   <select id="getSquareFeeRecordList" resultType="com.meisui.manage.entity.SquareFeeRecord">
+        select nickname,uid,start_time,fee_count,w_name,create_time from t_square_fee_record
+        <where>
+            <if test="nickname!=null and nickname!=''">
+                  nickname = #{nickname}
+            </if>
+            <if test="uid!=0">
+                  and uid = #{uid}
+            </if>
+            <if test="start_date!=null and end_date!=null">
+                  and date(start_time) between #{start_date} and #{end_date}
+            </if>
+        </where>
+        limit #{offset},#{rows}
+   </select>
+   <select id="getSquareFeeRecordCount" resultType="Integer">
+        select count(1) from t_square_fee_record
+        <where>
+            <if test="nickname!=null and nickname!=''">
+                  nickname = #{nickname}
+            </if>
+            <if test="uid!=0">
+                  and uid = #{uid}
+            </if>
+            <if test="start_date!=null and end_date!=null">
+                  and date(start_time) between #{start_date} and #{end_date}
+            </if>
+        </where>  
+   </select>
+</mapper>

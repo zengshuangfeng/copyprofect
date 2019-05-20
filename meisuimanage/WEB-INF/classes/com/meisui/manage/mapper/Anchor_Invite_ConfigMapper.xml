@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_Invite_ConfigDao">
+	<select id="getAnchorInviteConfigList" resultType="com.meisui.manage.entity.Anchor_Invite_Config">
+		select c.id,c.uid,c.f_uuid,c.max_reward,c.min_reward,c.update_time,c.w_name,c.is_online,u.nickname from t_anchor_invite_config c inner join t_user u on c.uid=u.id where c.is_del=0  
+		<if test="uid>0">
+		 and c.uid = #{uid}
+		</if>
+		<if test="is_online>-1">
+		 and c.is_online = #{is_online}
+		</if>		
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+		order by c.update_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getAnchorInviteConfigCount" resultType="Integer">
+		select count(1) from t_anchor_invite_config c inner join t_user u on c.uid=u.id where c.is_del=0 
+		<if test="uid>0">
+		 and c.uid = #{uid}
+		</if>
+		<if test="is_online>-1">
+		 and c.is_online = #{is_online}
+		</if>		
+		<if test="nickname != null and nickname != ''">
+			and u.nickname like "%"#{nickname}"%"
+		</if>
+	</select>	
+	<insert id="insertAnchorInviteConfig" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Invite_Config">
+		insert into t_anchor_invite_config
+		(f_uuid,uid,max_reward,min_reward,is_online,w_name,create_time,update_time)
+		values(#{f_uuid},#{uid},#{max_reward},#{min_reward},#{is_online},#{w_name},#{create_time},#{update_time})
+	</insert>	
+	<update id="updateAnchorInviteConfig" parameterType="com.meisui.manage.entity.Anchor_Invite_Config">
+		update t_anchor_invite_config set 
+		max_reward = #{max_reward},
+		min_reward = #{min_reward},
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<delete id="deleteAnchorInviteConfig">
+		update t_anchor_invite_config set is_del = 1,update_time=#{update_time},w_name = #{w_name} where id = #{id}
+	</delete>
+	<select id="getAnchorInviteConfig" resultType="com.meisui.manage.entity.Anchor_Invite_Config">
+		select *
+		from t_anchor_invite_config where id = #{id}
+	</select>
+	<select id="getAnchorInviteConfigIdWithUid" resultType="Integer">
+		select id
+		from t_anchor_invite_config where uid = #{uid} and is_del = 0
+	</select>
+	<select id="getAnchorRewardCount" resultType="Integer">
+		select sum(reward_count) from t_user_invite_phone where uid = #{uid}
+	</select>
+</mapper>
+
+ 
+  
+  
+  
+   

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iactivity_AnnualrDao">
+	<select id="getActivityAnnualList" resultType="com.meisui.manage.entity.Activity_Annual_Login">
+		select id,uid,login_time from t_activity_annual_login where id >0		
+		<if test="s_time != null and s_time != ''">
+		<![CDATA[ and login_time>=#{s_time} ]]>
+		</if>
+		<if test="e_time != null and e_time != ''">
+		<![CDATA[ and login_time<#{e_time} ]]>
+		</if>
+		order by login_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getActivityAnnualCount" resultType="Integer">
+		select count(1) from t_activity_annual_login where id >0
+		<if test="s_time != null and s_time != ''">
+		<![CDATA[ and login_time>=#{s_time} ]]>
+		</if>
+		<if test="e_time != null and e_time != ''">
+		<![CDATA[ and login_time<#{e_time} ]]>
+		</if>
+	</select>	
+	
+	<select id="getActivityAnnualPrize" resultType="com.meisui.manage.entity.Activity_Annual_Prize">
+	select id,prize_name from t_activity_annual_prize where id=#{prize_id}
+	</select>
+	<select id="getAllRecharge" resultType="Integer">
+		select ifnull(sum(recharge_rmb),0) from t_recharge where is_pay=1 
+		<if test="s_time != null and e_time != ''">
+		<![CDATA[ and create_time >=#{s_time} and create_time <= #{e_time}]]>
+		</if>
+	</select>
+	<select id="getAllBalanceVirtual" resultType="Integer">
+		select ifnull(sum(balance_money),0) from balance_virtualrecord where diamondsa= 'zftype1'
+		<if test="s_time != null and e_time != ''">
+		<![CDATA[ and create_date >=#{s_time} and create_date <= #{e_time}]]>
+		</if>
+	</select>
+	<select id="getAllPrizecount" resultType="Integer">
+		select count(id) from t_activity_annual_prize_user where prize_id=#{prize_id}
+		<if test="s_time != null and e_time != ''">
+		<![CDATA[ and create_time >=#{s_time} and create_time <= #{e_time}]]>
+		</if>
+	</select>
+		<select id="getActivityAnnual" resultType="com.meisui.manage.entity.Activity_Annual">
+		select id,activity_time,wheel,start_time,end_time from t_activity_annual where activity_time=#{activity_time}
+		
+	</select>
+		<select id="getActivityEndtime" resultType="com.meisui.manage.entity.Activity_Annual">
+		select id,activity_time,wheel,start_time,end_time from t_activity_annual where wheel=#{wheel} and activity_id=#{activity_id}
+	</select>
+		<select id="getAnnual_Prize_User" resultType="com.meisui.manage.entity.Activity_Annual_Prize_User">
+		select id,uid,prize_id,create_time,remark,is_take,w_name from t_activity_annual_prize_user where activity_id=#{activity_id}
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getgetAnnual_Prize_UserCount" resultType="Integer">
+		select count(1) from t_activity_annual_prize_user where activity_id=#{activity_id}
+	</select>
+		<update id="saveRemak">
+		update t_activity_annual_prize_user set remark=#{remark} ,w_name = #{w_name} where id=#{id}
+	</update>
+	<select id="getActivityAnnualDiscount" resultType="com.meisui.manage.entity.Activity_Annual_Discount">
+		select id,uid,discount,create_time from t_activity_annual_discount where uid=#{uid}
+	</select>
+	<select id="getRechargeLimitone" resultType="com.meisui.manage.entity.Recharge">
+	 select recharge_rmb,change_id,create_time from t_recharge where is_pay=1 and uid=#{uid}
+	  <![CDATA[ and create_time >=#{create_time}]]> order by create_time limit 1
+	</select>
+	<update id="updatePrizeUser">
+		update t_activity_annual_prize_user set is_take=#{is_take},w_name=#{w_name} where id=#{id}
+	</update>
+	<update id="updateIstake">
+	update t_activity_annual_prize_user set is_take=#{is_take} where id=#{id}
+	</update>
+	<select id="getActivityByid" resultType="com.meisui.manage.entity.Activity_Annual">
+		select id,activity_time,wheel from t_activity_annual where id=#{activity_id}
+	</select>
+</mapper>
+
+ 
+  
+  
+  
+   

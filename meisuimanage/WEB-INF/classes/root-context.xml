@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:lang="http://www.springframework.org/schema/lang" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         	http://www.springframework.org/schema/beans/spring-beans.xsd
+	         	http://www.springframework.org/schema/lang
+	         	http://www.springframework.org/schema/lang/spring-lang.xsd      
+	         	http://www.springframework.org/schema/tx   
+	         	http://www.springframework.org/schema/tx/spring-tx.xsd    
+	         	http://www.springframework.org/schema/aop     
+	         	http://www.springframework.org/schema/aop/spring-aop.xsd    
+	         	http://www.springframework.org/schema/mvc     
+	         	http://www.springframework.org/schema/mvc/spring-mvc.xsd   
+	         	http://www.springframework.org/schema/context     
+	         	http://www.springframework.org/schema/context/spring-context.xsd
+	         	http://www.springframework.org/schema/cache
+	         	http://www.springframework.org/schema/cache/spring-cache.xsd
+	         	http://www.springframework.org/schema/task 
+	         	http://www.springframework.org/schema/task/spring-task.xsd
+	         	http://www.springframework.org/schema/util
+	         	http://www.springframework.org/schema/util/spring-util-2.0.xsd
+	         	 ">
+	
+<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="2048" />
+		<property name="maxIdle" value="200" />
+		<property name="numTestsPerEvictionRun" value="1024" />
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />
+		<property name="minEvictableIdleTimeMillis" value="-1" />
+		<property name="softMinEvictableIdleTimeMillis" value="10000" />
+		<property name="maxWaitMillis" value="1500" />
+		<property name="testOnBorrow" value="true" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnReturn" value="false" />
+		<property name="jmxEnabled" value="true" />
+		<property name="jmxNamePrefix" value="pool" />
+		<property name="blockWhenExhausted" value="false" />
+	</bean>
+
+
+
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1" value="${redis.master.host}" />
+		<constructor-arg index="2" value="${redis.master.port}"
+			type="int" />
+		<constructor-arg index="3" value="${redis.master.timeout}"
+			type="int" />
+		<constructor-arg index="4" value="${redis.master.password}" />
+	</bean>
+
+
+	<!-- 装载相关配置文件 -->
+	<bean id="propertyConfigurer" class="com.meisui.manage.utils.PropertyUtil">
+		<property name="locations">
+			<list>
+				<value>classpath:config.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	 <bean id="ds1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+     <property name="url" value="${jdbc.url}" />
+     <property name="username" value="${jdbc.username}" />
+     <property name="password" value="${jdbc.password}" />
+
+     <property name="filters" value="stat" />
+
+     <property name="maxActive" value="20" />
+     <property name="initialSize" value="1" />
+     <property name="maxWait" value="60000" />
+     <property name="minIdle" value="1" />
+
+     <property name="timeBetweenEvictionRunsMillis" value="60000" />
+     <property name="minEvictableIdleTimeMillis" value="300000" />
+
+     <property name="testWhileIdle" value="true" />
+     <property name="testOnBorrow" value="false" />
+     <property name="testOnReturn" value="false" />
+
+     <property name="poolPreparedStatements" value="true" />
+     <property name="maxOpenPreparedStatements" value="20" />
+ </bean>
+
+	<bean id="dataSource" class="com.meisui.manage.mybatis.DynamicDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry value-ref="ds1" key="ds1"></entry>
+			</map>
+		</property>
+		<!-- 默认使用ds1的数据源 -->
+		<property name="defaultTargetDataSource" ref="ds1"></property>
+	</bean>	
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations"
+			value="classpath:com/meisui/manage/mapper/*Mapper.xml" />
+			<property name="configLocation" value="classpath:Mybatis-config.xml"></property>
+	</bean>
+	
+		<!-- Mapper接口所在包名，Spring会自动查找其下的Mapper -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="annotationClass" value="org.springframework.stereotype.Repository" />
+		<property name="basePackage" value="com.meisui.manage.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+	<context:component-scan base-package="com.meisui.manage.dao" />
+	<context:component-scan base-package="com.meisui.manage.service" />
+	<context:component-scan base-package="com.meisui.manage.util.BeanUtils" />
+	<!-- 事务管理器配置,单数据源事务 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>		
+	<util:map id="validatebean" map-class="java.util.HashMap">
+		<entry key="0" value="系统忙" />
+		<entry key="1" value="保存成功" />
+	 </util:map>
+	 	<util:map id="jumptype" map-class="java.util.LinkedHashMap">
+		<entry key="fm://applyanchor" value="申请主播" />
+		<entry key="fm://anchor" value="直播间" />
+		<entry key="fm://myaccount" value="我的账户页" />
+		<entry key="fm://mylevel" value="我的等级页" />
+		<entry key="fm://carmtop" value="魅力榜" />
+		<entry key="fm://tranttop" value="土豪榜" />
+		<entry key="fm://birthday" value="生日卡片" />
+		<entry key="fm://nojump" value="不跳转" />
+		<entry key="fm://inside" value="内嵌网页" />
+		<entry key="fm://outside" value="外链" />
+	</util:map>
+	 <util:map id="jumptype2" map-class="java.util.LinkedHashMap">
+		 <entry key="" value="不跳转" />
+		<entry key="ms://outside" value="链接" />
+		<entry key="ms://index" value="首页" />		
+		<entry key="ms://community" value="社区" />
+		<entry key="ms://anchor" value="直播间" />		
+	</util:map>
+	
+
+</beans>

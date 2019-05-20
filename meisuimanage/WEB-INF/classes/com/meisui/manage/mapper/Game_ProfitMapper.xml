@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Igame_ProfitDao">
+	<select id="getGameCapitalList" resultType="com.meisui.manage.entity.Game_Profit">
+		select total_bet_count,total_user_count,max_bet_count,percent,virtual_count,create_time from t_game_profit where 1=1
+		<if test="start_time != null">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getGameCapitalCount" resultType="Integer">
+		select count(1) from t_game_profit where 1=1
+		<if test="start_time != null">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+	</select>
+</mapper>

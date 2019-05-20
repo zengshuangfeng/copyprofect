@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.Iadmin_GroupDao">
+	<select id="getGroupList" resultType="com.meisui.manage.entity.Admin_Group">
+		select id,name,w_name,update_time 
+		from t_admin_group  where is_del=0   order by id limit #{offset},#{rows}
+	</select>
+	<select id="getGroupCount" resultType="Integer">
+		select count(1)
+		from t_admin_group  
+	</select>
+	<select id="getGrou" resultType="com.meisui.manage.entity.Admin_Group">
+		select *
+		from t_admin_group  where id=#{id} and is_del=0
+	</select>
+	<update id="updateGroup" parameterType="com.meisui.manage.entity.Admin_Group">
+		update t_admin_group set 
+		`name` = #{name},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		 where id = #{id} 
+	</update>
+	<insert id="insertGroup" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Admin_Group">
+		insert into t_admin_group
+		(`name`,w_name,update_time,create_time)
+		values(#{name},#{w_name},#{update_time},#{create_time})
+	</insert>
+	<update id="deleteGroup">
+		update t_admin_group set 
+		w_name = #{w_name},
+		update_time= #{update_time},
+		is_del = 1 
+		 where id = #{id} 
+	</update>
+	<select id="getAllGrouList" resultType="com.meisui.manage.entity.Admin_Group">
+		select * from t_admin_group  where is_del=0
+	</select>
+</mapper>  

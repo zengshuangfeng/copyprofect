@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.ImenuDao">
+	<select id="getMenuList" resultType="com.meisui.manage.entity.Menu">
+    select m.id,m.name,m.name_en,m.url,m.has_submenu,m.class_name,m.sort,m.f_id,(select `name` from t_manage_menu where id=m.f_id) as f_name ,m.isshow from  t_manage_menu m order by id limit #{offset},#{rows}
+	</select>
+	<select id="getMenuCount" resultType="Integer">
+		select count(1) from t_manage_menu  
+	</select>
+	<update id="updateMenu" parameterType="com.meisui.manage.entity.Menu">
+		update t_manage_menu set 
+		`name` = #{name},
+		name_en = #{name_en},
+		url = #{url},
+		has_submenu = #{has_submenu},
+		class_name = #{class_name},
+		sort = #{sort},
+		f_id = #{f_id},
+		isshow = #{isshow} 
+		 where id = #{id} 
+	</update>
+	<insert id="insertMenu" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Menu">
+		insert into t_manage_menu
+		(`name`,name_en,url,has_submenu,class_name,sort,f_id,isshow)
+		values(#{name},#{name_en},#{url},#{has_submenu},#{class_name},#{sort},#{f_id},#{isshow})
+	</insert>
+	<select id="getMenuById" resultType="com.meisui.manage.entity.Menu">
+		select * from t_manage_menu where id= #{id} 
+	</select>
+	<insert id="insertPermission" parameterType="Integer">
+		insert into t_admin_permission
+		(admin_id,menu_id)
+		values(#{admin_id},#{menu_id})
+	</insert>
+	<select id="getMenuNameList" resultType="com.meisui.manage.entity.Menu">
+    select id,name from t_manage_menu where isshow=1 and f_id=0
+    </select>
+</mapper>

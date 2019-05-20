@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iactivity_StarDao">
+	<select id="getActivityStartList" resultType="com.meisui.manage.entity.Activity_Star_Anchor">
+		select id,uid,score,grading,win,lose,total,create_time,is_cancel,w_name,update_time , @rank := @rank+1 as rank from t_activity_star_anchor, (SELECT @rank := 0) r where is_cancel=0
+		<if test="uid>0">
+		 and uid = #{uid}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+		and uid in (select id from t_user where nickname = #{nickname})
+		</if>
+		order by score desc limit #{offset},#{rows}
+	</select>	
+	<select id="getActivityStartCount" resultType="Integer">
+		select count(1) from t_activity_star_anchor where is_cancel=0
+		<if test="uid>0">
+		 and uid = #{uid}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+		and uid in (select id from t_user where nickname = #{nickname})
+		</if>
+	</select>	
+	<update id="updateactivitystaranchor" parameterType="com.meisui.manage.entity.Activity_Star_Anchor">
+	update t_activity_star_anchor set score = score + #{addscore},grading = #{grading} where id = #{id}
+	</update>
+	<insert id="insertstarrecord" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Activity_Star_Manage_Record">	
+		insert into t_activity_star_manage_record
+		(uid,add_score,create_time,w_name)
+		values 
+		(#{uid},#{add_score},#{create_time},#{w_name})
+		</insert>
+		
+		<select id="getPKRecord" resultType="com.meisui.manage.entity.Activity_Star_Competition">
+			select id,f_uid,t_uid,f_score,t_score,start_time,end_time,create_time,is_cancel,update_time from t_activity_star_competition where  f_uid = #{uid} or t_uid=#{uid} order by start_time desc limit #{offset},#{rows}	
+		</select>
+		<select id="getPKRecordCount" resultType="Integer">
+			select count(1) from  t_activity_star_competition where  f_uid = #{uid} or t_uid=#{uid} 
+		</select>
+		<select id="getstaranchorbyid" resultType="com.meisui.manage.entity.Activity_Star_Anchor">
+		select score,grading from t_activity_star_anchor where id = #{id}
+		</select>
+		<update id="updateCancel" parameterType="com.meisui.manage.entity.Activity_Star_Competition">
+		update t_activity_star_competition set is_cancel=1,w_name = #{w_name},update_time = #{date} where id=#{id}
+		</update>
+		<select id="getStarCompetition" resultType="Integer">
+		select count(id) from t_activity_star_competition where (f_uid = #{uid} or t_uid=#{uid}) and <![CDATA[ (start_time < #{date} and end_time > #{date} ) and(is_cancel=0)]]>
+		</select>
+			<update id="updateStartAnchorCancel" parameterType="com.meisui.manage.entity.Activity_Star_Anchor">
+		update t_activity_star_anchor set is_cancel=1 where id=#{id}
+		</update>
+		<update id="updateAnchorScore" parameterType="com.meisui.manage.entity.Activity_Star_Anchor">
+		update t_activity_star_anchor set score = 0,w_name=#{w_name},update_time = #{date}  where id=#{id}
+		</update>
+		<update id="updatecompetitiontime" parameterType="com.meisui.manage.entity.Activity_Star_Competition">
+		update t_activity_star_competition set start_time = #{start_time}, end_time = #{end_time},w_name = #{w_name},update_time = #{update_time} where id=#{id}
+		</update>
+		<select id="getactivitygrading" resultType="com.meisui.manage.entity.Activity_Star_Grading_Rule">
+		select name,score from t_activity_star_grading_rule where id = #{grading}
+		</select>
+		<select id="getactivityscore" resultType="Integer">
+		select score from t_activity_star_grading_rule where id = #{grading}
+		</select>
+		<select id="getactivitygradingrule" resultType="com.meisui.manage.entity.Activity_Star_Grading_Rule">
+		select id,name,score from t_activity_star_grading_rule 
+		</select>
+</mapper>
+
+ 
+  
+  
+  
+   

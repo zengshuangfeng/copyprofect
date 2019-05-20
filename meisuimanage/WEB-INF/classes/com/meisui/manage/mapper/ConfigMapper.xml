@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.IconfigDao">
+	<select id="getConfigValue" resultType="String">
+		select `values` from t_config where attribute=#{attribute}
+	</select>
+	<update id="setFeeCountLimit">
+	    update t_config set `values`=#{values} where attribute = #{attribute}
+	</update>
+	<select id="getAreaList" resultType="com.meisui.manage.entity.Area">
+		select id,`name` from t_area where f_id=#{f_id}
+	</select>
+	<select id="getUserList" resultType="com.meisui.manage.entity.User">
+		<![CDATA[select id,level from(SELECT
+	id,
+	LEVEL,
+	(
+		SELECT
+			score
+		FROM
+			t_user_info
+		WHERE
+			uid = u.id
+	) AS score,
+	(
+		SELECT
+			score
+		FROM
+			t_level_score
+		WHERE
+			LEVEL = u. LEVEL
+	) AS score2
+FROM
+	t_user u
+WHERE
+	istian = 1)t where score2>score]]>
+	</select>
+	<select id="getScoreWithLevel" resultType="Long">
+		select score from t_level_score where `level`=#{level}
+	</select>	
+	<select id="getHeadUserList" resultType="com.meisui.manage.entity.User">
+		SELECT * FROM t_user WHERE istian = '1' and id not in (select uid from t_pic_upload) AND head LIKE '%http://%' AND head LIKE '%.png%'  AND `head` NOT LIKE '%defaulthead.png%'
+	</select>
+	<insert id="insertPicUpload">
+		insert into t_pic_upload(uid,old_pic,new_pic) values(#{uid},#{old_pic},#{new_pic})
+	</insert>
+	<select id="getVestUserList" resultType="com.meisui.manage.entity.User">
+		select id,head from t_user where isvest=1 and id not in (select uid from t_pic_upload)  and head is not null GROUP BY head order by id
+	</select>
+	<select id="getPicUploadList" resultType="com.meisui.manage.entity.Pic_Upload">
+		<![CDATA[select u.id as uid,old_pic,new_pic from t_user u INNER JOIN t_pic_upload p on u.id=p.uid where u.head=p.old_pic ]]>
+	</select>
+	<update id="updateUserHead">
+		update t_user set head=#{head} where head=#{old_head}
+	</update>
+	<select id="getUserVestList" resultType="com.meisui.manage.entity.User">
+		select id,head from t_user_vest where is_import=0
+	</select>
+	<update id="updateVestUserHead">
+		update t_user_vest set head=#{head} where id=#{id}
+	</update>
+	<select id="getClearList" resultType="com.meisui.manage.entity.Anchor_Virtual_Change_Record">
+		select uid,total_anchor_virtual,(surplus_anchor_virtual-c) as surplus_anchor_virtual,(select ifnull(sum(change_virtual),0) from t_anchor_virtual_change_record where uid=t.uid)+c as total_change_virtual,c as change_virtual from (select uid,total_anchor_virtual,surplus_anchor_virtual,(surplus_anchor_virtual-(select IFNULL(sum(gift_virtual),0) from t_profit where (type=0 or type=7) and uid=u.uid and create_time>'2017-06-12'))as c from t_user_info u where surplus_anchor_virtual >0)t 
+	</select>
+	<select id="getProfitUidList" resultType="Long">
+	<![CDATA[select DISTINCT uid from t_profit where (type=0 or type=7) and create_time>#{start_time} and create_time<=#{end_time}]]>
+	</select>
+	<insert id="insertAnchorWeekExport" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Week_Export">
+		insert into t_anchor_week_export
+		(uid,f_uuid,nickname,`union`,total_anchor_virtual,total_stake,total_time,start_time,end_time,create_time)
+		values(#{uid},#{f_uuid},#{nickname},#{union},#{total_anchor_virtual},#{total_stake},#{total_time},#{start_time},#{end_time},#{create_time})
+	</insert>
+	<select id="getAnchorWeekExportList" resultType="com.meisui.manage.entity.Anchor_Week_Export">
+	<![CDATA[select * from t_anchor_week_export where start_time=#{start_time} and end_time=#{end_time}]]>
+	</select>
+	<select id="getTrialAnchorList" resultType="com.meisui.manage.entity.User_Anchor">
+	<![CDATA[SELECT
+	id as uid,
+	f_uuid,
+	nickname,
+	(
+		SELECT
+			NAME
+		FROM
+			t_anchor_union
+		WHERE
+			id = (
+				SELECT
+					union_id
+				FROM
+					t_user_anchor
+				WHERE
+					uid = u.id
+			)
+	) as union_name 
+FROM
+	t_user u
+WHERE
+	id IN (
+		SELECT DISTINCT
+			uid
+		FROM
+			t_apply
+		WHERE
+			create_time > #{start_time}
+		AND create_time < #{end_time}
+		AND uid IN (
+			SELECT
+				id
+			FROM
+				t_user
+			WHERE
+				is_anchor = 1
+		)
+	) and exists(select id from t_anchor_time where uid=u.id and is_secret = 0 and start_time>#{start_time} and end_time<#{end_time}) and not exists(select id from t_anchor_time where uid=u.id and is_secret = 0 and start_time<#{start_time})]]>
+	</select>
+		<insert id="insertAnchorCode">
+		insert into t_anchor_code(anchor_code) values(#{anchor_code})
+	</insert>
+	<select id="getTotalFlowUidList" resultType="Long">
+	<![CDATA[SELECT DISTINCT uid FROM `t_total_flowing` WHERE uid=442302 and `create_time` > '2017-07-07 23:43:08' and create_time<'2017-07-08 03:00:00' order by uid]]>
+	</select>
+	<select id="getTotalFlowWithUid" resultType="Long">
+	<![CDATA[SELECT spending_virtual FROM `t_total_flowing` WHERE uid=#{uid} and type=#{type} and `create_time` > '2017-07-07 23:43:08' and create_time<'2017-07-08 03:00:00']]>
+	</select>
+	<select id="getBalanceRecordList" resultType="Long">
+	<![CDATA[SELECT balance_virtual FROM balance_virtualrecord WHERE uid=#{uid} and id>445]]>
+	</select>
+	<insert id="insertTestBanlance">
+		insert into t_test_banlance(uid,balance_virtual,balance_virtual2) values(#{uid},#{balance_virtual},#{balance_virtual2})
+	</insert>
+	<select id="getBalance" resultType="Long">
+	<![CDATA[SELECT balance_virtual FROM t_user_copy WHERE id=#{uid}]]>
+	</select>
+	<select id="getPackAgeExtraChannelList" resultType="com.meisui.manage.entity.Package_Extra">
+	   	select `name`,channel from t_package_extra
+	</select>
+	<select id="getInviteMakeExist" resultType="Integer">
+		select id from t_invite_make where invite_makeamends=#{invite_makeamends}
+	</select>
+	<insert id="insertInviteMake">
+		insert into t_invite_make(invite_makeamends,is_use) values(#{invite_makeamends},#{is_use})
+	</insert>
+</mapper>

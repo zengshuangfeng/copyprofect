@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.InoticeDao">
+	<select id="list" resultType="com.meisui.manage.entity.Notice">
+		select id,content,sort,start_time,end_time,version,type,create_time,is_online,platform from t_announcement where is_del=0
+			<!-- 
+			<if test="begin_time!=''">
+				<![CDATA[and start_time>=#{begin_time}]]>
+			</if>
+			<if test="end_time!=''">
+			<![CDATA[and end_time<=#{end_time}]]>
+			</if>
+			<if test="type>-1">
+				and type=#{type}
+			</if>
+			<if test="state==1">
+				<![CDATA[and start_time>#{now} and is_online=1]]>
+			</if>
+			<if test="state==2">
+				<![CDATA[and #{now}>=start_time and end_time>#{now} and is_online=1]]>
+			</if>
+			<if test="state==3">
+				<![CDATA[and (#{now}>=end_time or is_online=0)]]>
+			</if>
+			<if test="platform!=0">
+				and (platform=#{platform} or platform=0)
+			</if>
+			 -->
+		order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+	<select id="listCount" resultType="Integer">
+		select count(1) from t_announcement where is_del=0
+			<!-- 
+			<if test="begin_time!=''">
+				<![CDATA[and start_time>=#{begin_time}]]>
+			</if>
+			<if test="end_time!=''">
+			<![CDATA[and end_time<=#{end_time}]]>
+			</if>
+			<if test="type>-1">
+				and type=#{type}
+			</if>
+			<if test="state==1">
+				<![CDATA[and start_time>#{now} and is_online=1]]>
+			</if>
+			<if test="state==2">
+				<![CDATA[and #{now}>=start_time and end_time>#{now} and is_online=1]]>
+			</if>
+			<if test="state==3">
+				<![CDATA[and (#{now}>=end_time or is_online=0)]]>
+			</if>
+			<if test="platform!=0">
+				and (platform=#{platform} or platform=0)
+			</if>
+			 -->
+	</select>
+	<select id="getNoticeById" resultType="com.meisui.manage.entity.Notice">
+		select id,content,sort,type,show_time,start_time,end_time,interval_minute,platform,is_online,version from t_announcement where id=#{id} and is_del=0
+	</select>
+	<insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Notice">
+		insert into t_announcement 
+		(content,sort,type,show_time,start_time,end_time,interval_minute,platform,is_online,version,create_time,w_name)
+		values 
+		(#{content},#{sort},#{type},#{show_time},#{start_time},#{end_time},#{interval_minute},#{platform},#{is_online},#{version},#{create_time},#{w_name})
+	</insert>
+	<update id="update">
+		update t_announcement set
+		content=#{content},
+		sort=#{sort},
+		type=#{type},
+		show_time=#{show_time},
+		start_time=#{start_time},
+		end_time=#{end_time},
+		interval_minute=#{interval_minute},
+		platform=#{platform},
+		is_online=#{is_online},
+		version=#{version},
+		update_time=#{update_time}
+		w_name=#{w_name}
+		where id=#{id}
+	</update>
+	<update id="delete">
+		update t_announcement set is_del=1 where id=#{id}
+	</update>
+</mapper>
+
+ 
+  
+  
+  
+   

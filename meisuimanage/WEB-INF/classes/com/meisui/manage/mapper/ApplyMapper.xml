@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IapplyDao">
+	<select id="getApplyList" resultType="com.meisui.manage.entity.Apply">
+		select a.id,a.head,a.phone,a.qq,a.uid,a.create_time,a.is_contact,a.remark,u.f_uuid,u.nickname,u.is_anchor from t_apply a left join t_user u on a.uid=u.id where 1=1  
+		<if test="is_contact>-1">
+		 and a.is_contact = #{is_contact}
+		</if>
+		<if test="uid>0">
+		 and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+		 and u.f_uuid = #{f_uuid}
+		</if>
+		<if test="qq != null and qq != ''">
+		 and a.qq = #{qq}
+		</if>
+		<if test="phone != null and phone != ''">
+		 and a.phone = #{phone}
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and u.nickname like "%"#{nickname}"%" 
+		</if>
+		<if test="remark != null and remark != ''">
+		 and a.remark like "%"#{remark}"%" 
+		</if>
+		<if test="start_time != null">
+		<![CDATA[ and a.create_time > #{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and a.create_time < #{end_time} ]]>
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getUserReal" resultType="com.meisui.manage.entity.User_Real">
+	     select name,card,phone as tel,qq from t_apply where uid = #{uid} order by create_time desc limit 1
+	</select>
+	<select id="getApplyCount" resultType="Integer">
+		select count(1) from t_apply a left join t_user u on a.uid=u.id where 1=1  
+		<if test="is_contact>-1">
+		 and a.is_contact = #{is_contact}
+		</if>
+		<if test="uid>0">
+		 and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+		 and u.f_uuid = #{f_uuid}
+		</if>
+		<if test="qq != null and qq != ''">
+		 and a.qq = #{qq}
+		</if>
+		<if test="phone != null and phone != ''">
+		 and a.phone = #{phone}
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and u.nickname like "%"#{nickname}"%" 
+		</if>
+		<if test="remark != null and remark != ''">
+		 and a.remark like "%"#{remark}"%" 
+		</if>
+		<if test="start_time != null">
+		<![CDATA[ and a.create_time > #{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and a.create_time < #{end_time} ]]>
+		</if>
+	</select>	
+	<update id="updateApply" parameterType="com.meisui.manage.entity.Apply">
+		update t_apply set 
+		is_contact = #{is_contact},
+		remark = #{remark},
+		w_name = #{w_name}
+		where id = #{id}
+	</update>
+	<select id="getApplyHead" resultType="String">
+		select head from t_apply where id=#{id}
+	</select>	
+	<select id="getApplyList2" resultType="com.meisui.manage.entity.Apply">
+		select distinct a.uid,a.head,a.phone,a.qq,a.create_time,a.is_contact,a.remark,u.f_uuid,u.nickname from t_apply a left join t_user u on a.uid=u.id where 1=1  
+		<if test="is_contact>-1">
+		 and a.is_contact = #{is_contact}
+		</if>
+		<if test="uid>0">
+		 and a.uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+		 and u.f_uuid = #{f_uuid}
+		</if>
+		<if test="qq != null and qq != ''">
+		 and a.qq = #{qq}
+		</if>
+		<if test="phone != null and phone != ''">
+		 and a.phone = #{phone}
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and u.nickname like "%"#{nickname}"%" 
+		</if>
+		<if test="remark != null and remark != ''">
+		 and a.remark like "%"#{remark}"%" 
+		</if>
+		<if test="start_time != null">
+		<![CDATA[ and a.create_time > #{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and a.create_time < #{end_time} ]]>
+		</if>
+		order by create_time asc
+	</select>	
+	<select id="getTel" resultType="String">
+		select phone from t_apply where uid=#{uid} order by create_time desc limit 1
+	</select>
+	<select id="getRealName" resultType="String">
+		select name from t_apply where uid=#{uid} order by id desc limit 0,1
+	</select>
+</mapper>

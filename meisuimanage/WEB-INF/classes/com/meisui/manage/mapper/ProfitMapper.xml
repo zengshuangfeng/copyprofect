@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IprofitDao">
+	<select id="getProfitList" resultType="com.meisui.manage.entity.Profit">
+		select create_time,gift_virtual,remark,type from t_profit where uid=#{uid} and type!=1 and type!=2 and type!=3 
+		<if test="type>-1">
+		 and type = #{type} 
+		</if>
+		 and create_time>=#{date} 
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getProfitCount" resultType="Integer">
+		select count(1) from t_profit where uid=#{uid} and type!=1 and type!=2 and type!=3 
+		<if test="type>-1">
+		 and type = #{type} 
+		</if>		
+		 and create_time>=#{date} 
+	</select>
+	<insert id="insertProfit" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Profit">
+		insert into t_profit(uid,send_uid,gift_virtual,create_time,w_name,type,remark) values(#{uid},#{send_uid},#{gift_virtual},#{create_time},#{w_name},#{type},#{remark})
+	</insert>	
+	<select id="getProfitListWithTime" resultType="com.meisui.manage.entity.Profit">
+		select gift_virtual,type from t_profit where uid=#{uid} and (type=0 or type=4 or type=5)
+		<![CDATA[ and create_time>=#{start_time} and create_time<#{end_time} ]]>
+		order by create_time asc
+	</select>
+	<select id="getProfitSum" resultType="Long">
+		<![CDATA[select (select IFNULL(sum(gift_virtual),0) from t_profit where type=0 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=4 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=7 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=8 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=9 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=11 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=10 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})-
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=5 and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})]]>
+	</select>	
+	<select id="getProfitTotalListWithUid" resultType="com.meisui.manage.entity.Anchor_Virtual_Total">
+			SELECT 
+			       t1.uid,
+			       t2.f_uuid,
+			       t2.nickname
+			FROM
+			(SELECT DISTINCT
+				uid
+			FROM
+				t_profit
+			WHERE
+				create_time 
+			BETWEEN #{start_time}
+			AND #{end_time}
+			AND (type = 0 OR type = 7))as t1
+			INNER JOIN (SELECT id,f_uuid,nickname FROM t_user
+			<where>
+				<if test="uid>0">id=#{uid}</if>
+				<if test="uid ==0 and f_uuid>0">and f_uuid=#{f_uuid}</if>
+				<if test="uid ==0 and f_uuid==0 and nickname != null and nickname !=''">and nickname = #{nickname}</if>
+				<if test="uid ==0 and f_uuid==0 and union_id>0">and id in (select uid from t_user_anchor where union_id=#{union_id})</if>
+			</where>
+			)as t2 ON t1.uid = t2.id limit #{offset},#{rows} 	 
+	</select>
+	
+	<select id="getGameProfit" resultType="Integer">
+		SELECT SUM(gift_virtual)AS game_profit FROM t_profit WHERE type = 7 and uid = #{uid} and date(create_time) between date(#{start_time}) and date(#{end_time})
+	</select>
+	
+	<select id="getSenderStatisticsList" resultType="com.meisui.manage.entity.SenderStatistics">
+		SELECT
+			COUNT(tt.send_uid)as count_sender,
+			SUM(tt.single_virtual)as total_virtual,
+			tt.LEVEL
+		FROM
+			(
+				SELECT
+					tp.send_uid,
+					tp.single_virtual,
+					tu.LEVEL
+				FROM
+					(
+						SELECT
+							send_uid,
+							SUM(gift_virtual) AS single_virtual
+						FROM
+							t_profit
+						WHERE
+						  create_time between #{start_time} and #{end_time}
+		                AND type = 0
+						AND uid = #{uid}
+						GROUP BY
+							send_uid
+					) AS tp
+				LEFT JOIN (SELECT id, LEVEL FROM t_user) AS tu ON tp.send_uid = tu.id
+				WHERE
+					tu.`level` = 1 OR tu.`level` = 2
+			) AS tt
+		GROUP BY tt.level;
+	</select>
+	<select id="getProfitTotalCountWithUid" resultType="Integer">
+			SELECT 
+              count(1)
+			FROM
+			(SELECT DISTINCT
+				uid
+			FROM
+				t_profit
+			WHERE
+				create_time 
+			BETWEEN #{start_time}
+			AND #{end_time}
+			AND (type = 0 OR type = 7))as t1
+			INNER JOIN (SELECT id,f_uuid,nickname FROM t_user
+			<where>
+				<if test="uid>0">id=#{uid}</if>
+				<if test="uid ==0 and f_uuid>0">and f_uuid=#{f_uuid}</if>
+				<if test="uid ==0 and f_uuid==0 and nickname != null and nickname !=''">and nickname = #{nickname}</if>
+				<if test="uid ==0 and f_uuid==0 and union_id>0">and id in (select uid from t_user_anchor where union_id=#{union_id})</if>
+			</where>
+			)as t2 ON t1.uid = t2.id
+	</select>
+	<select id="getOneProfitSum" resultType="Long">
+		<![CDATA[select (select IFNULL(sum(gift_virtual),0) from t_profit where type=0 and uid=#{uid} and (gift_id is null or gift_id=0) and create_time>=#{start_time} and create_time<#{end_time})]]>
+	</select>
+	
+	<select id="getProfitSumByType" resultType="Long">
+		select IFNULL(SUM(gift_virtual),0) from t_profit where operate_center_id=#{centerId}
+		<if test="type==0">
+		and (type=0 or type=9)
+		</if>
+		<if test="type==8">
+		and (type=8 or type=10 or type=11)
+		</if>
+		<if test="b_time!='' and e_time!=''">
+			<![CDATA[and create_time>=#{b_time} and create_time<=#{e_time}]]>
+		</if>
+	</select>
+		<select id="getProfitSumByType2" resultType="Long">
+		select IFNULL(SUM(gift_virtual),0) from t_profit where 1=1
+			<if test="type==0">
+			and (type=0 or type=9)
+		</if>
+		<if test="type==8">
+			and (type=8 or type=10 or type=11)
+		</if>
+		<if test="b_time!='' and e_time!=''">
+			<![CDATA[and create_time>=#{b_time} and create_time<=#{e_time}]]>
+		</if>
+	</select>
+	<select id="getProfitListWithAgentId" resultType="com.meisui.manage.entity.Profit">
+		select gift_virtual,gift_id,gift_divide,uid,create_time,type from t_profit where  uid in (select id from t_user where agent_id=#{agent_id}) 
+		<if test="type==0">
+			and (type=0 or type=9)
+		</if>
+		<if test="type==1">
+			and (type=8 or type=10 or type=11)
+		</if>
+		<if test="start_time != null and start_time != ''">
+			<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+			<![CDATA[ and create_time<#{end_time} ]]>
+		</if>	
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getProfitCountWithAgentId" resultType="Integer">
+		select count(1) from t_profit where uid in (select id from t_user where agent_id=#{agent_id}) 
+		<if test="type==0">
+			and (type=0 or type=9)
+		</if>
+		<if test="type==1">
+			and (type=8 or type=10 or type=11)
+		</if>
+		<if test="start_time != null and start_time != ''">
+			<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+			<![CDATA[ and create_time<#{end_time} ]]>
+		</if>	
+	</select>
+	<select id="getAllProfitSum" resultType="Long">
+		<![CDATA[select (select IFNULL(sum(gift_virtual),0) from t_profit where type=0 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})+
+		(select IFNULL(sum(gift_virtual),0) from t_profit where type=4 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})+
+		(select IFNULL(sum(gift_virtual),0) from t_profit where type=7 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})+
+		(select IFNULL(sum(gift_virtual),0) from t_profit where type=8 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})+
+		(select IFNULL(sum(gift_virtual),0) from t_profit where type=9 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})+
+		(select IFNULL(sum(gift_virtual),0) from t_profit where type=11 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})+
+		(select IFNULL(sum(gift_virtual),0) from t_profit where type=10 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})-
+		(select IFNULL(sum(gift_virtual),0) from t_profit where type=5 and operate_center_id=#{operate_center_id} and create_time>=#{start_time} and create_time<#{end_time})]]>
+	</select>
+	<select id="getProfitSumWithAgentId" resultType="Long">
+		<![CDATA[select (select IFNULL(sum(gift_virtual),0) from t_profit where type=0 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=4 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=7 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=8 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=9 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=11 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=10 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})-
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=5 and agent_id=#{agent_id} and create_time>=#{start_time} and create_time<#{end_time})]]>
+	</select>
+	<select id="getCenterProfitList" resultType="com.meisui.manage.entity.Profit">
+		select id,uid,gift_name,gift_id,gift_virtual,create_time,type from t_profit where operate_center_id=#{centerId}
+		<if test="type==0">
+			and (type=0 or type=9)
+		</if>
+		<if test="type==1">
+			and (type=8 or type=10 or type=11)
+		</if>
+		<if test="b_time!=''">
+			<![CDATA[and create_time>=#{b_time}]]>
+		</if>
+		<if test="e_time!=''">
+			<![CDATA[and create_time<=#{e_time}]]>
+		</if>
+		order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+	
+	<select id="getCenterProfitListCount" resultType="Integer">
+		select count(1) from t_profit where operate_center_id=#{centerId}
+		<if test="type==0">
+			and (type=0 or type=9)
+		</if>
+		<if test="type==1">
+			and (type=8 or type=10 or type=11)
+		</if>
+		<if test="b_time!=''">
+			<![CDATA[and create_time>=#{b_time}]]>
+		</if>
+		<if test="e_time!=''">
+			<![CDATA[and create_time<=#{e_time}]]>
+		</if>
+	</select>
+	<select id="getProfitSumByTypeAndAgentId" resultType="Integer">
+		select IFNULL(SUM(gift_virtual),0) from t_profit where agent_id=#{agentId}
+		<if test="type==0">
+		and (type=0 or type=9)
+		</if>
+		<if test="type==8">
+		and (type=8 or type=10 or type=11)
+		</if>
+	</select>
+	<select id="getProfitSumByTypeAndAgentId2" resultType="Integer">
+		select IFNULL(SUM(gift_virtual),0) from t_profit where  agent_id=#{agentId}
+		<if test="type==0">
+		and (type=0 or type=9)
+		</if>
+		<if test="type==8">
+		and (type=8 or type=10 or type=11)
+		</if>
+ <if test="b_time !=null and b_time !=''">
+ <![CDATA[ and create_time > #{b_time} ]]>
+ </if>
+ <if test="e_time !=null and e_time !=''">
+  <![CDATA[ and create_time < #{e_time} ]]>
+ </if>
+
+	</select>
+	
+	<select id="getProfitListWithOperateCenterId" resultType="com.meisui.manage.entity.Profit">
+		select gift_virtual,gift_id,gift_divide,uid,create_time,type,send_uid,is_box from t_profit where 1=1	
+		<choose>
+			<when test="type==-1">
+				and  (type=0 or type=8 or type=9 or type=10 or type=11) 
+			</when>
+			<otherwise>
+				<if test="type==0">
+			and (type=0 or type=9)
+		</if>
+		<if test="type==1">
+			and (type=8 or type=10 or type=11)
+		</if> 
+			</otherwise>
+		</choose>
+		<if test="operate_center_id>0">
+			and operate_center_id=#{operate_center_id}  
+		</if>
+		<if test="agent_id>0">
+		 and agent_id=#{agent_id} 
+		</if>
+		<if test="start_time != null and start_time != ''">
+			<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+			<![CDATA[ and create_time<#{end_time} ]]>
+		</if>	
+		<if test="f_uuid>0">
+			and uid in (select id from t_user where f_uuid=#{f_uuid})
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname=#{nickname})
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getProfitCountWithOperateCenterId" resultType="Integer">
+		select count(1) from t_profit where 1=1
+		<choose>
+			<when test="type==-1">
+				and (type=0 or type=8 or type=9 or type=10 or type=11) 
+			</when>
+			<otherwise>			 
+		<if test="type==0">
+			and (type=0 or type=9)
+		</if>
+		<if test="type==1">
+			and (type=8 or type=10 or type=11)
+		</if> 
+			</otherwise>
+		</choose>
+		<if test="operate_center_id>0">
+			and operate_center_id=#{operate_center_id}  
+		</if>
+		<if test="agent_id>0">
+		 and agent_id=#{agent_id} 
+		</if>
+		<if test="start_time != null and start_time != ''">
+			<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+			<![CDATA[ and create_time<#{end_time} ]]>
+		</if>	
+		<if test="f_uuid>0">
+			and uid in (select id from t_user where f_uuid=#{f_uuid})
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and uid in (select id from t_user where nickname=#{nickname})
+		</if>
+	</select>
+	<select id="getGiftProfitList" resultType="com.meisui.manage.entity.Profit">
+		select gift_name,gift_virtual,send_uid,gift_divide,uid,create_time,is_box ,type from t_profit where
+		(type=0 or type= 9) 
+		<if test="operate_center_id>0">
+		 and (operate_center_id=#{operate_center_id} or send_uid in (select id from t_user where operate_center_id=#{operate_center_id})) 
+		</if>
+		<if test="agent_id>0">
+			and (agent_id=#{agent_id} or send_uid in (select id from t_user where agent_id=#{agent_id})) 
+		</if>
+		<if test="s_time!=null">
+			<![CDATA[and create_time>=#{s_time}]]>
+		</if>
+		<if test="e_time!=null">
+			<![CDATA[and create_time<#{e_time}]]>
+		</if>
+		order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+	<select id="getGfitProfitListCount" resultType="Integer">
+		select count(1) from t_profit where
+		(type=0 or type= 9)
+		<if test="operate_center_id>0">
+		 and (operate_center_id=#{operate_center_id} or send_uid in (select id from t_user where operate_center_id=#{operate_center_id})) 
+		</if>
+		<if test="agent_id>0">
+			and (agent_id=#{agent_id} or send_uid in (select id from t_user where agent_id=#{agent_id})) 
+		</if>
+		<if test="s_time!=null">
+			<![CDATA[and create_time>=#{s_time}]]>
+		</if>
+		<if test="e_time!=null">
+			<![CDATA[and create_time<#{e_time}]]>
+		</if>
+	</select>
+	<select id="getProfitByPromoter" resultType="Long">
+	<![CDATA[select (select IFNULL(sum(gift_virtual),0) from t_profit where type=0 and uid=#{uid} and  create_time>=#{start_time} and create_time<#{end_time})+
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=9  and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})-
+			(select IFNULL(sum(gift_virtual),0) from t_profit where type=5 	and uid=#{uid} and create_time>=#{start_time} and create_time<#{end_time})]]>
+	</select>
+</mapper>

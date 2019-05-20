@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iindex_RecommendDao">
+	<select id="getIndexRecommendList" resultType="com.meisui.manage.entity.Index_Recommend">
+		select id,pic,style,style2,title,url,href,position,platform,version,is_online,s_time,e_time,w_name,update_time 
+		from t_index_recommend where is_del = 0 and style =  #{style} 
+		<if test="s_time != null and s_time != ''">
+		 and s_time &gt;= #{s_time}
+		</if>
+		<if test="e_time != null and e_time != ''">
+			<choose>
+				<when test="style==0"> and s_time &lt; #{e_time} </when>
+				<otherwise> and e_time &lt; #{e_time} </otherwise>
+			</choose>
+		</if>
+		<if test="style2>-1">
+		 and style2 = #{style2}
+		</if>
+		<choose>
+		<when test="status == 0"> and s_time &gt; current_timestamp() </when>
+		<when test="status == 1"> and s_time &lt;= current_timestamp() and e_time &gt;= current_timestamp() </when>
+		<when test="status == 2"> and e_time &lt; current_timestamp() </when>
+		</choose>
+		<choose>
+		<when test="platform == '00'">
+		 and platform = "00"
+		</when>
+		<when test="platform == '10'">
+		 and platform != "20"
+		</when>
+		<when test="platform == '20'">
+		 and platform != "10" 
+		</when>
+		</choose>
+		<if test="url != null and url != ''">
+		 and url = #{url}
+		</if>
+		<if test="s != null and s != ''">
+		 and title like "%"#{s}"%" 
+		</if>
+		order by update_time desc limit #{offset},#{rows}
+	</select>
+	
+	<select id="getIndexRecommendCount" resultType="Integer">
+		select count(1)
+		from t_index_recommend where is_del = 0 and style =  #{style} 
+		<if test="s_time != null and s_time != ''">
+		 and s_time &gt;= #{s_time}
+		</if>
+		<if test="e_time != null and e_time != ''">
+			<choose>
+				<when test="style==0"> and s_time &lt; #{e_time} </when>
+				<otherwise> and e_time &lt; #{e_time} </otherwise>
+			</choose>
+		</if>
+		<if test="style2>-1">
+		 and style2 = #{style2}
+		</if>
+		<choose>
+		<when test="status == 0"> and s_time &gt; current_timestamp() </when>
+		<when test="status == 1"> and s_time &lt;= current_timestamp() and e_time &gt;= current_timestamp() </when>
+		<when test="status == 2"> and e_time &lt; current_timestamp() </when>
+		</choose>
+		<choose>
+		<when test="platform == '00'">
+		 and platform = "00"
+		</when>
+		<when test="platform == '10'">
+		 and platform != "20"
+		</when>
+		<when test="platform == '20'">
+		 and platform != "10" 
+		</when>
+		</choose>
+		<if test="url != null and url != ''">
+		 and url = #{url}
+		</if>
+		<if test="s != null and s != ''">
+		 and title like "%"#{s}"%" 
+		</if>
+	</select>	
+	<insert id="insertIndexRecommend" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Index_Recommend">
+		insert into t_index_recommend
+		(title_en,is_online,title,pic,url,style,style2,href,platform,position,version,stayend,s_time,e_time,w_name,update_time,create_time,mobile_model,is_del,is_share,share_title,share_content,share_weibo_pic,share_weixin_pic,app,video,channel)
+		values(#{title_en},#{is_online},#{title},#{pic},#{url},#{style},#{style2},#{href},#{platform},#{position},#{version},#{stayend},#{s_time},#{e_time},#{w_name},#{update_time},#{create_time},#{mobile_model},0,#{is_share},#{share_title},#{share_content},#{share_weibo_pic},#{share_weixin_pic},#{app},#{video},#{channel})
+	</insert>	
+	<update id="updateIndexRecommend" parameterType="com.meisui.manage.entity.Index_Recommend">
+		update t_index_recommend set 
+		title = #{title},
+		style = #{style},
+		style2 = #{style2},
+		title_en = #{title_en},
+		is_online = #{is_online},
+		pic = #{pic},
+		url = #{url},
+		href = #{href},
+		platform = #{platform},
+		position = #{position},
+		version = #{version},
+		stayend = ${stayend},
+		s_time = #{s_time},
+		e_time = #{e_time},
+		w_name = #{w_name},
+		update_time = #{update_time},
+		mobile_model = #{mobile_model},
+		is_share=#{is_share},
+		share_title=#{share_title},
+		share_content=#{share_content},
+		share_weibo_pic=#{share_weibo_pic},
+		share_weixin_pic = #{share_weixin_pic},
+		app=#{app},
+		video=#{video},
+		channel=#{channel}   
+		where id = #{id}
+	</update>
+	<delete id="deleteIndexRecommend">
+		update t_index_recommend set is_del = 1,w_name = #{w_name} where id = #{id}
+	</delete>
+	<select id="getIndexRecommend" resultType="com.meisui.manage.entity.Index_Recommend">
+		select *
+		from t_index_recommend where id = #{id}
+	</select>
+	<update id="updateIndexRecommendPosition">
+		update t_index_recommend set 		
+		position = #{position},	
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+</mapper>
+
+ 
+  
+  
+  
+   

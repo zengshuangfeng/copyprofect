@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Itotal_FlowingDao">
+	<select id="getTotalFlowingList" resultType="com.meisui.manage.entity.Total_Flowing">
+		select type,balance_pay,create_time,remark,spending_virtual from t_total_flowing where uid = #{uid}
+		order by create_time desc,id desc limit #{offset},#{rows}
+	</select>	
+	<select id="getTotalFlowingCount" resultType="Integer">
+		select count(1) from t_total_flowing where uid = #{uid}
+	</select>	
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IChristmasDao">
+	<select id="getChristmasList" resultType="com.meisui.manage.entity.Christmas_User">
+		select id,prize_id,uid,create_time from t_christmas_user where id > 0
+		<if test="uid >0">
+		and uid = #{uid}
+		</if>
+		<if test="f_uuid !=null and f_uuid !=''">
+		and uid in (select id from t_user where f_uuid = #{f_uuid})
+		</if>
+		<if test="type>-1">
+		and prize_id in (select id from t_christmas_prize where type = #{type})
+		</if>
+		<if test="b_time != null and b_time != ''">
+				<![CDATA[ and create_time > #{b_time}]]>
+			</if>
+		<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+		</if>
+		order by create_time desc limit #{offset},#{rows}		
+	</select>
+	<select id="getChristmasRecordCount" resultType="Integer">
+	select count(1) from t_christmas_user where id > 0
+		<if test="uid >0">
+		and uid = #{uid}
+		</if>
+		<if test="f_uuid !=null and f_uuid !=''">
+		and uid in (select id from t_user where f_uuid = #{f_uuid})
+		</if>
+		<if test="type>-1">
+		and prize_id in (select id from t_christmas_prize where type = #{type})
+		</if>
+		<if test="b_time != null and b_time != ''">
+				<![CDATA[ and create_time > #{b_time}]]>
+			</if>
+		<if test="e_time != null and e_time != ''">
+				<![CDATA[ and create_time < #{e_time}]]>
+		</if>
+	</select>
+	<select id="getChristmasPrize" resultType="com.meisui.manage.entity.Christmas_Prize">
+	select id,type,pic,gift_id,prize_count from t_christmas_prize where is_del=0 and id = #{prize_id}
+	</select>
+</mapper>

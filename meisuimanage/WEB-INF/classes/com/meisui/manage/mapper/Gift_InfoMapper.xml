@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Igift_InfoDao">
+	<select id="getGiftInfoList" resultType="com.meisui.manage.entity.Gift_Info">
+		select id,gift_head,gift_name,gift_description,gift_virtual,gift_level,sort,is_online,anchor_divide,promoter_divide from t_gift_info where is_del=0 and is_box=#{is_box}
+		<if test="gift_id>0">
+		 and id = #{gift_id}
+		</if>
+		<if test="is_online>-1">
+		 and is_online = #{is_online}
+		</if>
+		<if test="is_private>-1">
+		 and is_private = #{is_private}
+		</if>
+		<if test="gift_name != null and gift_name != ''">
+		 and gift_name like "%"#{gift_name}"%" 
+		</if>
+		order by sort desc limit #{offset},#{rows}
+	</select>	
+		<select id="getGiftInfoList2" resultType="com.meisui.manage.entity.Gift_Info">
+		select id,gift_head,gift_name,gift_description,gift_virtual,gift_level,sort,is_online,anchor_divide,promoter_divide,type from t_gift_info where is_del=0 and is_box=#{is_box}
+		<if test="gift_id>0">
+		 and id = #{gift_id}
+		</if>
+		<if test="is_online>-1">
+		 and is_online = #{is_online}
+		</if>
+		<if test="is_private>-1">
+		 and is_private = #{is_private}
+		</if>
+		<if test="type>-1">
+		and type = #{type}
+		</if>
+		<if test="gift_name != null and gift_name != ''">
+		 and gift_name like "%"#{gift_name}"%" 
+		</if>
+		order by sort desc limit #{offset},#{rows}
+	</select>
+	<select id="getGiftInfoCount" resultType="Integer">
+		select count(1) from t_gift_info where is_del=0 and is_box=#{is_box}
+		<if test="gift_id>0">
+		 and id = #{gift_id}
+		</if>
+		<if test="is_online>-1">
+		 and is_online = #{is_online}
+		</if>
+		<if test="is_private>-1">
+		 and is_private = #{is_private}
+		</if>
+		<if test="gift_name != null and gift_name != ''">
+		 and gift_name like "%"#{gift_name}"%" 
+		</if>
+	</select>	
+		<select id="getGiftInfoCount2" resultType="Integer">
+		select count(1) from t_gift_info where is_del=0 and is_box=#{is_box}
+		<if test="gift_id>0">
+		 and id = #{gift_id}
+		</if>
+		<if test="is_online>-1">
+		 and is_online = #{is_online}
+		</if>
+		<if test="is_private>-1">
+		 and is_private = #{is_private}
+		</if>
+		<if test="type>-1">
+		and type = #{type}
+		</if>
+		<if test="gift_name != null and gift_name != ''">
+		 and gift_name like "%"#{gift_name}"%" 
+		</if>
+	</select>	
+	<insert id="insertGiftInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Gift_Info">
+		insert into t_gift_info
+		(gift_head,gift_name,gift_description,type,gift_virtual,gift_level,is_private,sort,is_online,w_name,create_time,update_time,anchor_virtual,gift_type,screen_type,version,gift_key,quantifier,module,anchor_divide,promoter_divide,is_box,gift_time,gift_webp,gift_head2,old_gift_id)
+		values(#{gift_head},#{gift_name},#{gift_description},#{type},#{gift_virtual},#{gift_level},#{is_private},#{sort},#{is_online},#{w_name},#{create_time},#{update_time},#{anchor_virtual},#{gift_type},#{screen_type},#{version},#{gift_key},#{quantifier},#{module},#{anchor_divide},#{promoter_divide},#{is_box},#{gift_time},#{gift_webp},#{gift_head2},#{old_gift_id})
+	</insert>	
+	<update id="updateGiftInfo" parameterType="com.meisui.manage.entity.Gift_Info">
+		update t_gift_info set 
+		gift_head = #{gift_head},
+		gift_name = #{gift_name},
+		gift_description = #{gift_description},
+		gift_virtual = #{gift_virtual},
+		gift_level = #{gift_level},
+		is_private = #{is_private},
+		sort = #{sort},
+		is_online = #{is_online},
+		anchor_virtual = #{anchor_virtual},
+		gift_type = #{gift_type},
+		screen_type = #{screen_type},
+		version = #{version},
+		gift_key = #{gift_key},
+		quantifier = #{quantifier},
+		module = #{module},
+		w_name = #{w_name},
+		update_time = #{update_time},
+		anchor_divide = #{anchor_divide},
+		promoter_divide = #{promoter_divide},
+		is_box = #{is_box},
+		gift_time = #{gift_time},
+		gift_webp = #{gift_webp},
+		gift_head2 = #{gift_head2},
+		old_gift_id=#{old_gift_id},
+		type=#{type}  
+		where id = #{id}
+	</update>
+	<delete id="deleteGiftInfo">
+		update t_gift_info set is_del = 1,update_time=#{update_time},w_name = #{w_name} where id = #{id}
+	</delete>
+	<select id="getGiftInfo" resultType="com.meisui.manage.entity.Gift_Info">
+		select id,gift_name,gift_virtual,gift_description,type,gift_head,gift_type,quantifier,screen_type,anchor_virtual,gift_level,sort,version,is_online,anchor_divide,promoter_divide,gift_time,gift_webp,gift_head2,old_gift_id
+		from t_gift_info where id = #{id}
+	</select>
+	<update id="updateGiftInfoOnline">
+		update t_gift_info set 
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+	<select id ="getUidMake" resultType="Long">
+		select id from t_uid_make where uid_makeamends = #{uid_makeamends}
+	</select>
+	<insert id="insertUidMake">
+		insert into t_uid_make (uid_makeamends,is_use) values(#{uid_makeamends},0)
+	</insert>
+	<select id="getGiftInfoWithIsOnline" resultType="com.meisui.manage.entity.Gift_Info">
+	select id,gift_name from t_gift_info where is_online=1 and is_del=0 and is_box=1
+	</select>
+	<select id="getAllGiftInfo" resultType="com.meisui.manage.entity.Gift_Info">
+	select id,gift_name from t_gift_info where is_online=1 and is_del = 0  order by sort desc
+	</select>
+	<select id="getShortGiftList" resultType="com.meisui.manage.entity.Short_Gift">
+		select id,gift_id,gift_pic,create_date,update_date,w_name,remark from t_short_gift limit 1
+	</select>
+	<select id="getShortGiftByid" resultType="com.meisui.manage.entity.Short_Gift">
+		select id,gift_id,gift_pic,create_date,update_date,w_name,remark from t_short_gift where id=#{id}
+	</select>
+		<update id="updateShortGift" parameterType="com.meisui.manage.entity.Short_Gift">
+		update t_short_gift set 
+		gift_id = #{gift_id},
+		gift_pic = #{gift_pic},
+		update_date = #{update_date},
+		remark = #{remark},
+		w_name=#{w_name} 
+		where id = #{id}
+	</update>
+</mapper>
+
+ 
+  
+  
+  
+   

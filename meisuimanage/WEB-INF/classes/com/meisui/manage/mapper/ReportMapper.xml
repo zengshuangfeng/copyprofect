@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IreportDao">
+	<select id="getAnchorReportList" resultType="com.meisui.manage.entity.Report">
+		select id,uid,f_uuid,nickname,o_uid,o_nickname,create_time from (select r.id,r.uid,u.f_uuid,u.nickname,r.o_uid,(select nickname from t_user where id=r.o_uid) as o_nickname,r.pic,r.create_time from t_report r inner join t_user u on r.uid=u.id where r.is_anchor = 1)t where 1=1 
+		<if test="uid>0">
+		 and uid = #{uid} 
+		</if>
+		<if test="f_uuid>0">
+		 and f_uuid = #{f_uuid} 
+		</if>
+		<if test="o_uid>0">
+		 and o_uid=#{o_uid} 
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and nickname like "%"#{nickname}"%"
+		</if>
+		<if test="o_nickname != null and o_nickname != ''">
+		 and o_nickname like "%"#{o_nickname}"%"
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getAnchorReportCount" resultType="Integer">
+		select count(1) from (select r.uid,u.f_uuid,u.nickname,r.o_uid,(select nickname from t_user where id=r.o_uid) as o_nickname,r.is_anchor from t_report r inner join t_user u on r.uid=u.id where r.is_anchor =1)t where 1 = 1 
+		<if test="uid>0">
+		 and uid = #{uid} 
+		</if>
+		<if test="f_uuid>0">
+		 and f_uuid = #{f_uuid} 
+		</if>
+		<if test="o_uid>0">
+		 and o_uid=#{o_uid} 
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and nickname like "%"#{nickname}"%"
+		</if>
+		<if test="o_nickname != null and o_nickname != ''">
+		 and o_nickname like "%"#{o_nickname}"%"
+		</if>
+	</select>	
+	<select id="getUserReportList" resultType="com.meisui.manage.entity.Report">
+		<![CDATA[select r.uid,u.nickname,u.head,`level`,sex,balance_virtual,head,is_blocked,count(1) as report_count  from t_report r inner join t_user u on r.uid=u.id where (r.is_anchor = 0 or video_id>0) ]]>
+		<if test="uid>0">
+		 and r.uid = #{uid} 
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and nickname like "%"#{nickname}"%"
+		</if>
+		<if test="start_time != null">
+		<![CDATA[ and r.create_time >= #{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and r.create_time < #{end_time} ]]>
+		</if>
+		group by uid order by r.create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getUserReportCount" resultType="Integer">
+		<![CDATA[select count(1) from t_report r inner join t_user u on r.uid=u.id where (r.is_anchor = 0 or video_id>0) ]]>
+		<if test="uid>0">
+		 and r.uid = #{uid} 
+		</if>
+		<if test="nickname != null and nickname != ''">
+		 and nickname like "%"#{nickname}"%"
+		</if>
+		<if test="start_time != null">
+		<![CDATA[ and r.create_time >= #{start_time} ]]>
+		</if>
+		<if test="end_time != null">
+		<![CDATA[ and r.create_time < #{end_time} ]]>
+		</if>
+	</select>
+	<update id="updateReportIsLook">
+	  update t_report set islook=#{islook},w_name=#{w_name},update_time=#{update_time} where id=#{id}
+	</update>
+</mapper>

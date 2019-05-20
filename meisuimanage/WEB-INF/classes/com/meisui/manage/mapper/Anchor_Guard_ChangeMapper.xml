@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_Guard_ChangeDao">
+	<select id="getGuardChangeList" resultType="com.meisui.manage.entity.Anchor_Guard_Change">
+	select `id`,`name`,`change_rmb`,`guard_head`,`entrance_pic`,`type`,`is_online`,`is_del`,`w_name`,`create_time`,`update_time` from t_anchor_guard_change
+	where is_del=0  order by create_time desc limit #{offset},#{rows} 
+	</select>
+	<select id="getGuardChangeNewList" resultType="com.meisui.manage.entity.Anchor_Guard_Change2">
+	select `id`,`name`,`change_virtual`,`guard_head`,`entrance_pic`,`vehicle_pic`,`exclusive_pic`,`guard_head_big`,`entrance_pic_big`,`vehicle_pic_big`,`exclusive_pic_big`,`type`,`is_online`,`is_del`,`w_name`,`create_time`,`update_time` from t_anchor_guard_change2
+	where is_del=0  order by create_time desc limit #{offset},#{rows} 
+	</select>
+	<select id="getGuardChangeCount" resultType="Integer">
+	select count(1) from t_anchor_guard_change where is_del=0  
+	</select>
+	<select id="getGuardChangeNewCount" resultType="Integer">
+	select count(1) from t_anchor_guard_change2 where is_del=0  
+	</select>
+	<update id="updateGuardChangeOnline">
+		update t_anchor_guard_change set 
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+	<update id="updateGuardChangeOnlineNew">
+		update t_anchor_guard_change2 set 
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+	<update id="deleteGuardChange">
+	update t_anchor_guard_change set 
+	is_del=1,
+	w_name = #{w_name},
+	update_time = #{update_time}
+	where id = #{id}
+	</update>
+	<update id="updateAnchorGuardChange" parameterType="com.meisui.manage.entity.Anchor_Guard_Change">
+		update t_anchor_guard_change set 
+		name=#{name},change_rmb = #{change_rmb},guard_head = #{guard_head},entrance_pic= #{entrance_pic},type=#{type},is_online=1,is_del=0,
+		w_name=#{w_name},update_time=#{update_time} where id = #{id}
+	</update>
+	<update id="updateAnchorGuardChangeNew" parameterType="com.meisui.manage.entity.Anchor_Guard_Change2">
+		update t_anchor_guard_change2 set 
+		name=#{name},change_virtual = #{change_virtual},guard_head = #{guard_head},entrance_pic= #{entrance_pic},vehicle_pic=#{vehicle_pic},exclusive_pic=#{exclusive_pic},guard_head_big = #{guard_head_big},entrance_pic_big= #{entrance_pic_big},vehicle_pic_big=#{vehicle_pic_big},exclusive_pic_big=#{exclusive_pic_big},type=#{type},is_online=1,is_del=0,
+		w_name=#{w_name},update_time=#{update_time} where id = #{id}
+	</update>
+	<insert id="inserAnchorGuardChange" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Guard_Change">
+	INSERT INTO t_anchor_guard_change (
+		name,change_rmb,guard_head,entrance_pic,type,is_online,is_del,w_name,create_time,update_time)
+		VALUES
+		(#{name},#{change_rmb},#{guard_head},#{entrance_pic},#{type},1,0,#{w_name},#{create_time},#{update_time})
+	</insert>
+	<insert id="inserAnchorGuardChangeNew" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Guard_Change2">
+	INSERT INTO t_anchor_guard_change2 (
+		name,change_virtual,guard_head,entrance_pic,vehicle_pic,exclusive_pic,guard_head_big,entrance_pic_big,vehicle_pic_big,exclusive_pic_big,type,is_online,is_del,w_name,create_time,update_time)
+		VALUES
+		(#{name},#{change_virtual},#{guard_head},#{entrance_pic},#{vehicle_pic},#{exclusive_pic},#{guard_head_big},#{entrance_pic_big},#{vehicle_pic_big},#{exclusive_pic_big},#{type},1,0,#{w_name},#{create_time},#{update_time})
+	</insert>
+	<select id="getAnchorGuardByid" resultType="com.meisui.manage.entity.Anchor_Guard_Change">
+	select `id`,`name`,`change_rmb`,`guard_head`,`entrance_pic`,`type`,`is_online`,`is_del`,`w_name`,`create_time`,`update_time` from t_anchor_guard_change
+	where id=#{id}
+	</select>
+		<select id="getAnchorGuardNewByid" resultType="com.meisui.manage.entity.Anchor_Guard_Change2">
+	select `id`,`name`,`change_virtual`,`guard_head`,`entrance_pic`,`vehicle_pic`,`exclusive_pic`,`type`,`guard_head_big`,`entrance_pic_big`,`vehicle_pic_big`,`exclusive_pic_big`,`is_online`,`is_del`,`w_name`,`create_time`,`update_time` from t_anchor_guard_change2
+	where id=#{id}
+	</select>
+	<select id="getGuardRecord" resultType="com.meisui.manage.entity.Profit">
+	select id,operate_center_id,agent_id,uid,gift_id,gift_name,gift_virtual,gift_divide,send_uid,remark,create_time from t_profit where 1=1
+	
+	 <if test="type==-1">
+	 and  (type=9 or type=10)
+	 </if>
+	  <if test="type==9">
+	 and  type=9
+	 </if>
+	 <if test="type==10">
+	 and type=10
+	 </if>
+	<if test="operate_center_id >0">
+	and operate_center_id = #{operate_center_id}
+	</if>
+	<if test="agent_id >0">
+	and agent_id=#{agent_id}
+	</if>
+	<if test="send_uid>0">
+	and send_uid = #{send_uid}
+	</if>
+	<if test="anchor_f_uuid >0">
+	and uid in (select id from t_user where f_uuid = #{anchor_f_uuid})
+	</if>
+	<if test="f_uuid >0">
+	and send_uid in (select id from t_user where f_uuid = #{f_uuid})
+	</if>
+	<if test="nickname !=null and nickname !=''">
+	and send_uid in(select id from t_user where nickname like "%"#{nickname}"%")
+	</if>
+	<if test="start_time != null and start_time != ''">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+		order by create_time desc limit #{offset},#{rows} 
+	</select>
+	<select id="getGuardRecordCount" resultType="Integer">
+		select count(1) from t_profit where 1=1
+	
+	 <if test="type==-1">
+	 and  (type=9 or type=10)
+	 </if>
+	  <if test="type==9">
+	 and  type=9
+	 </if>
+	 <if test="type==10">
+	 and type=10
+	 </if>
+	<if test="operate_center_id >0">
+	and operate_center_id = #{operate_center_id}
+	</if>
+	<if test="agent_id >0">
+	and agent_id=#{agent_id}
+	</if>
+	<if test="send_uid>0">
+	and send_uid = #{send_uid}
+	</if>
+	<if test="anchor_f_uuid >0">
+	and uid in (select id from t_user where f_uuid = #{anchor_f_uuid})
+	</if>
+	<if test="f_uuid >0">
+	and send_uid in (select id from t_user where f_uuid = #{f_uuid})
+	</if>
+	<if test="nickname !=null and nickname !=''">
+	and send_uid in(select id from t_user where nickname like "%"#{nickname}"%")
+	</if>
+	<if test="start_time != null and start_time != ''">
+		<![CDATA[ and create_time>=#{start_time} ]]>
+		</if>
+		<if test="end_time != null and end_time != ''">
+		<![CDATA[ and create_time<#{end_time} ]]>
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IAnchor_GuardDao">
+	<select id="getGuardList" resultType="com.meisui.manage.entity.Anchor_Guard">
+		<![CDATA[select id,anchor_f_uuid,uid,start_time,end_time,type from t_anchor_guard where end_time > now() ]]>
+		<if test="anchor_f_uuid !=null and anchor_f_uuid !=''">
+		and anchor_f_uuid = #{anchor_f_uuid}
+		</if>
+		<if test="uid >0 ">
+		and uid = #{uid}
+		</if>
+		<if test="type > -1">
+		and type = #{type}
+		</if>
+		 limit #{offset},#{rows}
+		
+	</select>
+	<select id="getGuardListCount" resultType="Integer">
+		<![CDATA[select count(1) from t_anchor_guard where end_time > now() ]]>
+		<if test="anchor_f_uuid !=null and anchor_f_uuid !=''">
+		and anchor_f_uuid = #{anchor_f_uuid}
+		</if>
+		<if test="uid >0 ">
+		and uid = #{uid}
+		</if>
+		<if test="type >-1">
+		and type = #{type}
+		</if>	
+	</select>	
+	<select id="getGuardChange" resultType="com.meisui.manage.entity.Anchor_Guard_Change">
+	select id,name,change_rmb,type from t_anchor_guard_change where is_del = 0 and is_online = 1
+	</select>
+	<select id="getGuardChangeNew" resultType="com.meisui.manage.entity.Anchor_Guard_Change2">
+	select id,name,change_virtual,type from t_anchor_guard_change2 where is_del = 0 and is_online = 1
+	</select>
+	<select id="getGuardByuid" resultType="com.meisui.manage.entity.Anchor_Guard">
+	select id,anchor_f_uuid,uid,start_time,end_time,type from t_anchor_guard where anchor_f_uuid=#{anchor_f_uuid} and uid = #{uid}
+	</select>
+	<insert id="insertAnchorGuard" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Guard">
+	INSERT INTO t_anchor_guard (
+		anchor_f_uuid,uid,start_time,end_time,type)
+		VALUES
+		(#{anchor_f_uuid},#{uid},#{start_time},#{end_time},#{type})
+	</insert>
+	<insert id="inserAnchorGuardManager" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Guard_Manager">
+		INSERT INTO t_anchor_guard_manage (
+		change_id,anchor_f_uuid,uid,start_time,end_time,w_name,create_time,need_pay)
+		VALUES
+		(#{change_id},#{anchor_f_uuid},#{uid},#{start_time},#{end_time},#{w_name},#{create_time},#{need_pay})
+	</insert>
+	<update id="updateAnchorGuard" parameterType="com.meisui.manage.entity.Anchor_Guard">
+	update t_anchor_guard set start_time = #{start_time},end_time= #{end_time},type=#{type} where id = #{id}
+	</update>
+	<select id="getGuardWithuid" resultType="com.meisui.manage.entity.Anchor_Guard">
+	select id,type,start_time,end_time from t_anchor_guard where anchor_f_uuid=#{anchor_f_uuid} and uid = #{uid}
+	</select>
+	
+</mapper>

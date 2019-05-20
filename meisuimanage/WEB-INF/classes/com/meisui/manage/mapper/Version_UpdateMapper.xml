@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.Iversion_UpdateDao">
+	<select id="getVersionUpdateList" resultType="com.meisui.manage.entity.Version_Update">
+		select id,version,content,effect_time,platform,is_online,w_name from t_version_update where is_del=0 order by effect_time desc limit #{offset},#{rows}
+	</select>
+	
+	<select id="getVersionUpdateCount" resultType="Integer">
+		select count(1) from t_version_update where is_del=0
+	</select>	
+	<insert id="insertVersionUpdate" parameterType="com.meisui.manage.entity.Version_Update">
+		insert into t_version_update(version,content,effect_time,platform,is_online,w_name,create_time,update_time,`force`,url) 
+		              values(#{version},#{content},#{effect_time},#{platform},#{is_online},#{w_name},#{create_time},#{update_time},#{force},#{url})
+	</insert>	
+	<update id="updateVersionUpdateOnline">
+		update t_version_update set 
+		 is_online=#{is_online},
+		 w_name=#{w_name},
+		 update_time=#{update_time}
+		where id = #{id}
+	</update>	
+</mapper>  

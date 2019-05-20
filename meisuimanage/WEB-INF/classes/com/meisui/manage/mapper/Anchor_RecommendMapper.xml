@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_RecommendDao">
+	<select id="getAnchorRecommendList" resultType="com.meisui.manage.entity.Anchor_Recommend">
+		select id,f_uuid,pic,sort,create_time,w_name,update_time from t_anchor_recommend where is_del=0
+		<if test="f_uuid !=null and f_uuid !=''">
+			and f_uuid = #{f_uuid}
+		</if>
+		<if test="nickname !=null">
+			and f_uuid in (select f_uuid from t_user where nickname like "%"#{nickname}"%")
+		</if>
+		order by sort desc,create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getAnchorRecommendCount" resultType="Integer">
+		select count(1) from t_anchor_recommend where is_del=0
+		<if test="f_uuid !=null and f_uuid !=''">
+			and f_uuid = #{f_uuid}
+		</if>
+		<if test="nickname !=null">
+			and f_uuid in (select f_uuid from t_user where nickname like "%"#{nickname}"%")
+		</if>
+	</select>
+	<update id="deleteAnchorRecommend" parameterType="com.meisui.manage.entity.Anchor_Recommend">
+		update t_anchor_recommend set is_del = 1 where id = #{id}
+	</update>
+	<select id="getAnchorRecommendbyuid" resultType="Integer">
+	select count(id) from t_anchor_recommend where f_uuid = #{f_uuid} and is_del=0
+	</select>
+	
+		<insert id="insertAnchorRecommend" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Recommend">
+		insert into t_anchor_recommend
+		(f_uuid,pic,sort,w_name,create_time,update_time,is_del)
+		values(#{f_uuid},#{pic},#{sort},#{w_name},#{create_time},#{update_time},#{is_del})
+	</insert>	
+		<update id="updateAnchorRecommend" parameterType="com.meisui.manage.entity.Anchor_Recommend">
+		update t_anchor_recommend set 
+		f_uuid = #{f_uuid},
+		pic=#{pic},
+		sort=#{sort},
+		w_name=#{w_name},
+		update_time = #{update_time},
+		is_del = #{is_del}
+		where id = #{id}
+	</update>
+	<select id="getAnchorRecommend" resultType="com.meisui.manage.entity.Anchor_Recommend">
+	select id,f_uuid,pic,sort,create_time,w_name,update_time from t_anchor_recommend where id = #{id}
+	</select>
+</mapper>

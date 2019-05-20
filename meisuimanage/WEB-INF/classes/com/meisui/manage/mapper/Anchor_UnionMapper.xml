@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_UnionDao">
+	<select id="getAnchorUnionList" resultType="com.meisui.manage.entity.Anchor_Union">
+		select id,name,remark,create_time,divide_proportion,one_divide_proportion,type from t_anchor_union where is_del=0
+		<if test="name != null and name != ''">
+		 and name like "%"#{name}"%" 
+		</if>
+		<if test="remark != null and remark != ''">
+		 and remark like "%"#{remark}"%" 
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getAnchorUnionCount" resultType="Integer">
+		select count(1) from t_anchor_union where is_del=0 
+		<if test="name != null and name != ''">
+		 and name like "%"#{name}"%" 
+		</if>
+		<if test="remark != null and remark != ''">
+		 and remark like "%"#{remark}"%" 
+		</if>
+	</select>	
+	<insert id="insertAnchorUnion" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Union">
+		insert into t_anchor_union
+		(name,remark,divide_proportion,one_divide_proportion,type,username,password,create_time,update_time,w_name,commander,weixin,qq,tel,email,card_holder,bank_card_no,province,city,bank_name,company,business_license)
+		values(#{name},#{remark},#{divide_proportion},#{one_divide_proportion},#{type},#{username},#{password},#{create_time},#{update_time},#{w_name},#{commander},#{weixin},#{qq},#{tel},#{email},#{card_holder},#{bank_card_no},#{province},#{city},#{bank_name},#{company},#{business_license})
+	</insert>	
+	<update id="updateAnchorUnion" parameterType="com.meisui.manage.entity.Anchor_Union">
+		update t_anchor_union set 
+		name = #{name},
+		remark = #{remark},
+		divide_proportion = #{divide_proportion},
+		one_divide_proportion=#{one_divide_proportion},
+		type = #{type},
+		username = #{username},
+		<if test="password != null and password != ''">password=#{password},</if>
+        update_time = #{update_time},
+        w_name = #{w_name},
+        commander = #{commander},
+		weixin = #{weixin},
+		qq = #{qq},
+		tel = #{tel},
+		email = #{email},
+		card_holder = #{card_holder },
+		bank_card_no = #{bank_card_no},
+		province = #{province},
+		city = #{city},
+		bank_name = #{bank_name},
+		company = #{company},
+		business_license = #{business_license} 
+		where id = #{id}
+	</update>
+	<select id="getAnchorUnion" resultType="com.meisui.manage.entity.Anchor_Union">
+		select *
+		from t_anchor_union where id = #{id}
+	</select>
+	<select id="getAnchorUnionDivideProportion" resultType="Integer">
+		select divide_proportion
+		from t_anchor_union where id = #{id}
+	</select>
+	<select id="getAllAnchorUnionList" resultType="com.meisui.manage.entity.Anchor_Union">
+		select id,name from t_anchor_union where is_del=0
+	</select>
+	<!-- 获取周结工会列表  -->
+	<select id="getWeekSettleAnchorUnionList" resultType="com.meisui.manage.entity.Anchor_Union">
+		select id,name from t_anchor_union where is_del=0 and type = 0	
+	</select>	
+	<!-- 获取日结工会列表  -->
+	<select id="getDaySettleAnchorUnionList" resultType="com.meisui.manage.entity.Anchor_Union">
+		select id,name from t_anchor_union where is_del=0 and type = 1	
+	</select>	
+	<update id="deleteAnchorUnion">
+		update t_anchor_union set 
+		is_del=1,
+        update_time = #{update_time},
+        w_name = #{w_name}
+		where id = #{id}
+	</update>
+	<select id="getAnchorUnionId" resultType="Integer">
+		select id from t_anchor_union where id != #{id} and username=#{username} limit 1
+	</select>
+	<select id="getAnchorUnionOneDivideProportion" resultType="Integer">
+		select one_divide_proportion
+		from t_anchor_union where id = #{id}
+	</select>
+</mapper>

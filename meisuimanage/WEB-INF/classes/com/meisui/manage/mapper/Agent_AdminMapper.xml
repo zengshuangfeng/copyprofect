@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iagent_AdminDao">
+	<update id="updateAgent">
+		update t_agent_admin set
+		username=#{username},
+		<if test="password!=''">
+			password=#{password},
+		</if>
+		remark=#{remark},
+		w_name=#{w_name},
+		update_time=#{update_time}
+		where agent_id=#{id} and agent_promoter_id=0
+	</update>
+	<select id="getAdminByUsername" resultType="Integer">
+		select id from t_agent_admin where username = #{username} limit 1
+	</select>
+	<delete id="deleteUserBinding">
+		 delete from t_agent_user_binding where agent_admin_id = #{agent_admin_id}
+	</delete>
+</mapper>
+
+ 
+  
+  
+  
+   

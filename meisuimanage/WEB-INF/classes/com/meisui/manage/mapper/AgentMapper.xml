@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.IagentDao">
+	<select id="getAgenIdstByOperateCenterId" resultType="Integer">
+		select id from t_agent where operate_center_id=#{id} and is_del=0 
+	</select>
+	<select id="getAgentNameByagentid" resultType="com.meisui.manage.entity.Agent">
+	select name from t_agent where id= #{agentid} and is_del=0
+	</select>
+	<select id="getAgentNameById" resultType="String">
+		select name from t_agent where id=#{agent_id}
+	</select>
+	<select id="getAgentByagentid" resultType="com.meisui.manage.entity.Agent">
+	select name,divide from t_agent where id = #{agent_id}
+	</select>
+	<select id="getAgentListByOperateCenterId" resultType="com.meisui.manage.entity.Agent">
+		select id,name,nickname,divide,create_time,remark,is_forbid from t_agent where operate_center_id=#{centerId}
+		<if test="agentName!=''">
+			and name=#{agentName}
+		</if>
+		<if test="agentId>0">
+			and id=#{agentId}
+		</if>
+		order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+		<select id="getAgentList" resultType="com.meisui.manage.entity.Agent">
+		select id,name,nickname,divide,create_time,remark,is_forbid from t_agent where operate_center_id=#{centerId}
+		<if test="agentName!=''">
+			and name=#{agentName}
+		</if>
+		<if test="agentId>0">
+			and id=#{agentId}
+		</if>
+		order by create_time desc
+	</select>
+	
+		<select id="getAllAgentListByOperateCenterId" resultType="com.meisui.manage.entity.Agent">
+		select id,operate_center_id,name,nickname,divide,create_time,remark,is_forbid from t_agent where 1=1
+		<if test="agentName!=''">
+			and name=#{agentName}
+		</if>
+		<if test="agentId>0">
+			and id=#{agentId}
+		</if>
+		<if test="operate_center_id>0">
+			and operate_center_id=#{operate_center_id}
+		</if>
+		order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+	
+	<select id="getAgentListCountByOperateCenterId" resultType="Integer">
+		select count(1) from t_agent where operate_center_id=#{centerId}
+		<if test="agentName!=''">
+			and name=#{agentName}
+		</if>
+		<if test="agentId>0">
+			and id=#{agentId}
+		</if>
+	</select>
+		<select id="getAllAgentListCountByOperateCenterId" resultType="Integer">
+		select count(1) from t_agent where 1=1
+		<if test="agentName!=''">
+			and name=#{agentName}
+		</if>
+		<if test="agentId>0">
+			and id=#{agentId}
+		</if>
+		<if test="operate_center_id>0">
+			and operate_center_id=#{operate_center_id}
+		</if>
+	</select>
+	
+		<select id="getAgent" resultType="com.meisui.manage.entity.Agent">
+		select id,`name`,divide,remark,username,password,contact,card_name,card_no,card_bank,province,city,company from t_agent where id=#{id}
+	</select>
+	<update id="updateAgent">
+		update t_agent set
+		`name`=#{name},
+		divide=#{divide},
+		remark=#{remark},
+		username=#{username},
+		contact=#{contact},
+		card_name=#{card_name},
+		card_no=#{card_no},
+		card_bank=#{card_bank},
+		province=#{province},
+		city=#{city},
+		company=#{company},
+		update_time=#{update_time},
+		w_name=#{w_name}
+		<if test="password !=null and password !=''">
+		,password = #{password}
+		</if>
+		where id=#{id}
+	</update>
+	<select id="getAgentVirtualSum" resultType="Long">
+		select ifnull(sum(total_anchor_virtual),0) from t_agent where operate_center_id=#{operate_center_id}
+	</select>
+	<select id="getAgentSurplusVirtualSum" resultType="Long">
+		select ifnull(sum(surplus_anchor_virtual),0) from t_agent where operate_center_id=#{operate_center_id}
+	</select>
+	<select id="getAgentSettlementList" resultType="com.meisui.manage.entity.Agent">
+		select id,operate_center_id,name,divide,total_anchor_virtual,surplus_anchor_virtual from t_agent 
+		<![CDATA[ where is_del=0 and surplus_anchor_virtual>0 ]]>
+		<if test="centerIds.size()>0">
+			and operate_center_id in
+			<foreach collection="centerIds" item="c_id" open="(" separator="," close=")">
+				#{c_id}
+			</foreach>
+		</if>
+		<if test="agent_id>0">
+			and id=#{agent_id}
+		</if>
+		order by create_time desc
+		limit #{offset},#{rows}
+	</select>
+	<select id="getAgentSettlementListCount" resultType="Integer">
+		select count(1) from t_agent 
+		<![CDATA[ where is_del=0 and surplus_anchor_virtual>0 ]]>
+		<if test="centerIds.size()>0">
+			and operate_center_id in
+			<foreach collection="centerIds" item="c_id" open="(" separator="," close=")">
+				#{c_id}
+			</foreach>
+		</if>
+		<if test="agent_id>0">
+			and id=#{agent_id}
+		</if>
+	</select>
+	<select id="getAgentSettlementList2" resultType="com.meisui.manage.entity.Agent">
+		select a.id,a.name,b.settlement_type,a.divide,a.total_anchor_virtual,a.surplus_anchor_virtual,b.id as operate_center_id from t_agent a
+		left join t_operate_center b on a.operate_center_id=b.id
+		where a.is_del=0 and b.settlement_type=#{type}
+		<if test="agentIds.size()>0">
+			and a.id not in
+			<foreach collection="agentIds" item="a_id" open="(" separator="," close=")">
+				#{a_id}
+			</foreach>
+		</if>
+		<if test="agent_id>0">
+			and a.id=#{agent_id}
+		</if>
+	</select>
+	<update id="updateIsForBid">
+		update t_agent set
+		is_forbid=#{is_forbid},
+		w_name=#{w_name}
+		where id=#{id}
+	</update>
+	<select id="getAgentUsernameExist" resultType="Integer">
+		SELECT id from t_agent where username=#{username} and id!=#{id}	
+	</select>
+	<select id="getAgentListByCenterId" resultType="com.meisui.manage.entity.Agent">
+		select id,name from t_agent where operate_center_id=#{centerId}
+	</select>
+	<update id="clearAgent">
+		update t_agent set surplus_anchor_virtual = surplus_anchor_virtual - #{sub} where id=#{id}
+	</update>
+</mapper>

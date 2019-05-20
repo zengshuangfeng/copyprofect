@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iuser_StartDao">
+	<select id="getLastUseTimeWithUid" resultType="java.util.Date">
+		select login_time from t_user_start where uid=#{uid} order by login_time desc limit 1
+	</select>	
+</mapper>

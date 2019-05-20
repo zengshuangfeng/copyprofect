@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Iuser_Check_RuleDao">
+	<select id="getUserCheckRuleList" resultType="com.meisui.manage.entity.User_Check_Rule">
+		select id,days,reward_count,min_rand,max_rand,w_name,create_time from t_user_check_rule  
+		order by days asc limit #{offset},#{rows}
+	</select>	
+	<select id="getUserCheckRuleCount" resultType="Integer">
+		select count(1) from t_user_check_rule
+	</select>	
+	<update id="updateUserCheckRule" parameterType="com.meisui.manage.entity.User_Check_Rule">
+		update t_user_check_rule set 
+		reward_count =#{reward_count},
+		create_time = #{create_time}
+		<if test="days==7">
+		,min_rand = #{min_rand}
+		,max_rand = #{max_rand} 
+		</if>
+		where id = #{id}
+	</update>
+	<select id="getUserCheckRule" resultType="com.meisui.manage.entity.User_Check_Rule">
+		select *
+		from t_user_check_rule where id = #{id}
+	</select>
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IVIP_Room">
+    <select id="getVIPChangeList" resultType="com.meisui.manage.entity.VIPChange">
+         select id,name,days,change_rmb,is_online,w_name,update_time from t_vip_change limit #{offset},#{rows}
+    </select>
+    <select id="getVIPChangeCount" resultType="Integer">
+         select count(1) from t_vip_change;
+    </select>
+    <select id="getVIPChange" resultType="com.meisui.manage.entity.VIPChange">
+         select id,name,days,change_rmb,is_online,w_name,update_time from t_vip_change where id = #{id}
+    </select>
+    <update id="updateVIPChange" parameterType="com.meisui.manage.entity.VIPChange">
+         update t_vip_change set name=#{name},days=#{days},change_rmb=#{change_rmb},is_online=#{is_online},w_name=#{w_name}
+         ,update_time=#{update_time} where id = #{id}
+    </update>
+    <insert id="insertVIPChange" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.VIPChange">
+         insert into t_vip_change(name,days,change_rmb,is_online,w_name,update_time,create_time) values(#{name},#{days},#{change_rmb},#{is_online},#{w_name},#{update_time},#{create_time})
+    </insert>    
+</mapper>

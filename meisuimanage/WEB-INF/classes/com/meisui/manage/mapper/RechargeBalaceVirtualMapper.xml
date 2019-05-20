@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IRechargeBalanceVirtualDao">
+		<select id="getBalanceVirtualUserList" resultType="com.meisui.manage.entity.User">
+		select id,f_uuid,nickname,balance_virtual,register_time from t_user where isvest=0
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and nickname=#{nickname}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+		order by register_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getBalanceVirtualUserCount" resultType="Integer">
+	select count(1) from t_user where isvest=0
+		<if test="uid>0">
+			and id=#{uid}
+		</if>
+		<if test="nickname !=null and nickname !=''">
+			and nickname=#{nickname}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+	</select>
+		<update id="updaterechargebalance_virtual">
+		update t_user set
+		balance_virtual=balance_virtual+#{balance_virtual} where id = #{id}
+	</update>
+	<select id="getUserByid" resultType="com.meisui.manage.entity.User">
+		select id,nickname,f_uuid,balance_virtual from t_user where id =
+		#{uid}
+	</select>
+</mapper>

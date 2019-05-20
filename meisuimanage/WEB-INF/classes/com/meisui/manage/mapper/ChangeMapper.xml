@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IchangeDao">
+	<select id="getChangeList" resultType="com.meisui.manage.entity.Change">
+		select id,virtual_count,change_rmb,w_name,is_online,update_time,is_virtual from t_change where is_del=0 
+		order by virtual_count desc limit #{offset},#{rows}
+	</select>	
+	<select id="getChangeCount" resultType="Integer">
+		select count(1) from t_change where is_del=0 
+	</select>	
+	<insert id="insertChange" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Change">
+		insert into t_change
+		(virtual_count,change_rmb,w_name,is_online,create_time,update_time,is_virtual)
+		values(#{virtual_count},#{change_rmb},#{w_name},#{is_online},#{create_time},#{update_time},#{is_virtual})
+	</insert>	
+	<update id="updateChange" parameterType="com.meisui.manage.entity.Change">
+		update t_change set 
+		virtual_count = #{virtual_count},
+		change_rmb = #{change_rmb},
+		is_online = #{is_online},
+		is_virtual = #{is_virtual},
+		w_name = #{w_name},
+		update_time = #{update_time},
+		is_virtual = #{is_virtual} 
+		where id = #{id}
+	</update>
+	<delete id="deleteChange">
+		update t_change set is_del = 1,update_time=#{update_time},w_name = #{w_name} where id = #{id}
+	</delete>
+	<select id="getChange" resultType="com.meisui.manage.entity.Change">
+		select *
+		from t_change where id = #{id}
+	</select>
+	<update id="updateChangeOnline">
+		update t_change set 
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+	<select id="getAllChangeList" resultType="com.meisui.manage.entity.Change">
+		select id,virtual_count,change_rmb,w_name,is_online,update_time,is_virtual from t_change where is_del=0 
+		order by virtual_count asc
+	</select>
+	<update id="updateChangeVirtual">
+		update t_change set 
+		is_virtual = #{is_virtual},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+</mapper>
+
+ 
+  
+  
+  
+   

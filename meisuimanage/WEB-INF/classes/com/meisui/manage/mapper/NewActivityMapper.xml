@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.InewActivityDao">
+	<select id="getNewActivityList" resultType="com.meisui.manage.entity.New_Activity">
+		select id,`name`,url,type,pic,state_time,end_time,time_type,position,`order`,is_share,platform,is_online,create_date,w_name,update_time from t_new_activity where is_del=0 
+		<if test="is_online>-1">
+		 and is_online = #{is_online}
+		</if>
+		order by `order` desc , state_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getNewActivityCount" resultType="Integer">
+		select count(1) from t_new_activity where is_del=0 
+		<if test="is_online>-1">
+		 and is_online = #{is_online}
+		</if>
+	</select>	
+		<insert id="insertNewActivity" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.New_Activity">
+		insert into t_new_activity
+		(`name`,url,type,pic,state_time,end_time,time_type,position,`order`,is_share,platform,is_online,create_date,w_name,update_time)
+		values(#{name},#{url},#{type},#{pic},#{state_time},#{end_time},#{time_type},#{position},#{order},#{is_share},#{platform},#{is_online},#{create_date},#{w_name},#{update_time})
+	</insert>	
+	<update id="updateNewActivity" parameterType="com.meisui.manage.entity.New_Activity">
+		update t_new_activity set 
+		`name` = #{name},
+		url = #{url},
+		type = #{type},
+		pic = #{pic},
+		state_time = #{state_time},
+		end_time = #{end_time},
+		time_type = #{time_type},
+		position = #{position},
+		`order` = #{order},
+		is_share = #{is_share},
+		platform = #{platform},
+		is_online = #{is_online},
+		create_date = #{create_date},
+		w_name = #{w_name},
+		update_time = #{update_time}
+		where id = #{id}
+	</update>
+	<select id="getNewActivity" resultType="com.meisui.manage.entity.New_Activity">
+	select id,`name`,url,type,pic,state_time,end_time,time_type,position,`order`,is_share,platform,is_online,create_date,w_name,update_time from t_new_activity 
+	where id = #{id}
+	</select>
+		<update id="updateNewActivityOnline">
+		update t_new_activity set 
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+</mapper>
+
+ 
+  
+  
+  
+   

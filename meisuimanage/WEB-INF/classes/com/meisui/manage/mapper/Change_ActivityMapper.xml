@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ichange_ActivityDao">
+	<select id="getChangeActivityList" resultType="com.meisui.manage.entity.Change_Activity">
+		select a.id,a.activity_rmb,a.is_first,a.start_time,a.end_time,a.w_name,a.is_online,a.update_time,c.change_rmb,c.virtual_count from t_change_activity a inner join t_change c on a.change_id=c.id where a.is_del=0 
+		order by a.update_time desc limit #{offset},#{rows}
+	</select>	
+	<select id="getChangeActivityCount" resultType="Integer">
+		select count(1) from t_change_activity where is_del=0 
+	</select>	
+	<insert id="insertChangeActivity" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Change_Activity">
+		insert into t_change_activity
+		(change_id,activity_rmb,is_first,start_time,end_time,w_name,is_online,create_time,update_time)
+		values(#{change_id},#{activity_rmb},#{is_first},#{start_time},#{end_time},#{w_name},#{is_online},#{create_time},#{update_time})
+	</insert>	
+	<update id="updateChangeActivity" parameterType="com.meisui.manage.entity.Change_Activity">
+		update t_change_activity set 
+		change_id = #{change_id},
+		activity_rmb=#{activity_rmb},
+		is_first=#{is_first},
+		start_time=#{start_time},
+		end_time=#{end_time},
+		is_online = #{is_online},
+		w_name = #{w_name},
+		update_time = #{update_time} 
+		where id = #{id}
+	</update>
+	<delete id="deleteChangeActivity">
+		update t_change_activity set is_del = 1,update_time=#{update_time},w_name = #{w_name} where id = #{id}
+	</delete>
+	<select id="getChangeActivity" resultType="com.meisui.manage.entity.Change_Activity">
+		select *
+		from t_change_activity where id = #{id}
+	</select>
+</mapper>
+
+ 
+  
+  
+  
+   

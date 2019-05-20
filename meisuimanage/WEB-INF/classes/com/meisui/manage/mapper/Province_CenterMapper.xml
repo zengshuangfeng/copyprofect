@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.IProvince_CenterDao">
+	<select id="getProviceCenterList" resultType="com.meisui.manage.entity.Province_Center">
+		select id,name,remark,username,password,create_time,update_time,w_name,is_forbid from t_province_center where id>0
+		<if test="province_center_name !=null and province_center_name !=''">
+		 and name like "%"#{province_center_name}"%"
+		</if>
+		<if test="province_center_id > 0">
+		 and id = #{province_center_id}
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getProviceCenterCount" resultType="Integer">
+	select count(1) from t_province_center where id>0
+		<if test="province_center_name !=null and province_center_name !=''">
+		 and name like "%"#{province_center_name}"%"
+		</if>
+		<if test="province_center_id > 0">
+		 and id = #{province_center_id}
+		</if>
+	</select>
+	<select id="getOperateUsernameExist" resultType="Integer">
+		select id from t_province_center where username = #{username} and id != #{id}
+	</select>
+	<select id="getOperateCenterById" resultType="com.meisui.manage.entity.Province_Center">
+		select id,name,remark,username,password,create_time,update_time,w_name,is_forbid from t_province_center where  id = #{province_center_id}
+	</select>
+	<select id="getPasswordByCenterId" resultType="String">
+		select password from t_province_center where id=#{id}
+	</select>
+		<update id="update">
+		update t_province_center set
+		name=#{name},
+		username=#{username},
+		<if test="password!='' and password!=null">
+			password=#{password},
+		</if>
+		update_time=#{update_time},
+		remark=#{remark},
+		w_name=#{w_name},
+		is_forbid=#{is_forbid}
+		where id=#{id}
+	</update>
+	<insert id="save" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Province_Center">
+		insert into t_province_center 
+		(name,username,password,create_time,w_name,remark,is_forbid)
+		values
+		(#{name},#{username},#{password},#{create_time},#{w_name},#{remark},#{is_forbid})
+	</insert>
+		<update id="updateProviceIsonline">
+		update t_province_center set is_forbid=#{is_forbid} where id=#{id}
+	</update>
+	<select id="getProvinceCenterList" resultType="com.meisui.manage.entity.Province_Center">
+		select id,name from t_province_center where is_forbid=0 order by create_time desc
+	</select>
+</mapper>

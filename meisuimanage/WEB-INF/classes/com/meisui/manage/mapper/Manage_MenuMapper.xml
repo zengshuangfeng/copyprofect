@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.Imanage_MenuDao">
+	<select id="getMenuList" resultType="com.meisui.manage.entity.Manage_Menu">
+		select m.id,m.name,m.name_en,m.f_id,m.has_submenu,url,p.admin_id
+		from t_manage_menu m INNER JOIN t_admin_permission p on (p.menu_id = m.id or p.menu_id = m.f_id) and p.admin_id = #{admin_id} where m.isshow = 1 order by m.f_id,m.sort asc
+	</select>	
+	<select id="getFMenuList" resultType="com.meisui.manage.entity.Manage_Menu">
+		select id,name,f_id
+		from t_manage_menu where isshow = 1 and name_en != 'permission'
+	</select>
+	<select id="getMenuListByAdminId"  resultType="com.meisui.manage.entity.Manage_Menu">
+		select m.id,m.name,m.name_en,m.f_id,m.has_submenu,url,p.admin_id,class_name 
+		from t_manage_menu m INNER JOIN t_admin_permission p on p.menu_id = m.id and p.admin_id = #{admin_id} where m.isshow = 1  
+		 order by m.f_id,m.sort asc
+	</select>
+	<select id="getMenuListByAdminId2"  resultType="com.meisui.manage.entity.Manage_Menu">
+		select m.id,m.name,m.name_en,m.f_id,m.has_submenu,url,p.admin_id
+		from t_manage_menu m INNER JOIN t_admin_permission p on p.menu_id = m.id and p.admin_id = #{admin_id} where m.isshow = 1 
+	<!-- 	<if test="admin_id!=1">
+		  and name_en != 'permission' and f_id!=3
+		</if> -->
+		and f_id!=3
+		 order by m.f_id,m.sort asc
+	</select>
+	<select id="getMenuListByAdminId3"  resultType="com.meisui.manage.entity.Manage_Menu">
+		select m.id,m.name,m.name_en,m.f_id,m.has_submenu,url,p.admin_id,class_name 
+		from t_manage_menu m INNER JOIN t_admin_permission p on p.menu_id = m.id and p.admin_id = #{admin_id} where m.isshow = 1  
+		<!--  <if test="admin_id !=1">
+		  and name_en != 'permission' 
+		 </if> -->
+		 order by m.f_id,m.sort asc
+	</select>
+	<select id="getGroup" resultType="com.meisui.manage.entity.Admin">
+		select `group` 
+		from t_admin where id=#{admin_id} 
+	</select>
+	<select id="getMangeFid" resultType="com.meisui.manage.entity.Manage_Menu">
+	select  f_id,id from t_manage_menu where f_id in (select id from t_manage_menu where f_id>0 and isshow=1)
+	</select>
+</mapper>  

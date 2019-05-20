@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ivirtual_AccountDao">
+	
+	<select id="getRechargeVirtualList" resultType="com.meisui.manage.entity.Recharge_Virtual">
+		select
+		id,operate_center_id,uid,f_uuid,virtual_count,create_time,w_name
+		from t_recharge_virtual where 1=1
+		<if test="uid>0">
+			and uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+		<if test="operate_centerid>0">
+		    and operate_center_id=#{operate_centerid} 
+		</if>
+		<if test="b_time != null and b_time != ''">
+		<![CDATA[ and create_time>=#{b_time} ]]>
+		</if>
+		<if test="e_time != null and e_time != ''">
+		<![CDATA[ and create_time<=#{e_time} ]]>
+		</if>
+		order by create_time desc limit #{offset},#{rows}
+	</select>
+		<select id="getRechargeVirtualListCount" resultType="Integer">
+		select count(1) from t_recharge_virtual where 1=1
+		<if test="uid>0">
+			and uid = #{uid}
+		</if>
+		<if test="f_uuid>0">
+			and f_uuid = #{f_uuid}
+		</if>
+		<if test="operate_centerid>0">
+		    and operate_center_id=#{operate_centerid} 
+		</if>
+		<if test="b_time != null and b_time != ''">
+		<![CDATA[ and create_time>=#{b_time} ]]>
+		</if>
+		<if test="e_time != null and e_time != ''">
+		<![CDATA[ and create_time<=#{e_time} ]]>
+		</if>
+		
+	</select>
+	<select id="getUserVirtualRecordAll" resultType="com.meisui.manage.entity.User_Virtual_Record">
+	select id ,uid ,w_name,create_time,type from t_user_virtual_record where 1=1
+		<if test="b_time !=null and b_time !=''">
+ 	 		<![CDATA[and create_time >= #{b_time} ]]>
+	 	   </if>
+ 		<if test="e_time !=null and e_time !=''">
+  			<![CDATA[ and create_time <= #{e_time} ]]>
+ 		</if>
+ 		order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getUserVirtualRecordAllCount" resultType="Integer">
+	select count(1) from t_user_virtual_record where 1=1
+	<if test="b_time !=null and b_time !=''">
+ 	 		<![CDATA[and create_time >= #{b_time} ]]>
+	 	   </if>
+ 		<if test="e_time !=null and e_time !=''">
+  			<![CDATA[ and create_time <= #{e_time} ]]>
+ 		</if>
+	</select>
+	<select id="getOperateCenterList" resultType="com.meisui.manage.entity.Operate_Center">
+	select id,name,remark,create_time,recharge_quota from t_operate_center where 1=1
+	<if test="operate_center_id>0">
+	and id=#{operate_center_id}
+	</if>
+	<if test="operate_name !=null and operate_name !=''">
+	and name = #{operate_name}
+	</if>
+		order by create_time desc 
+		limit #{offset},#{rows}
+	</select>
+		<select id="getOperateCenterCount" resultType="Integer">
+		select count(1) from t_operate_center where 1=1
+	<if test="operate_center_id>0">
+	and id=#{operate_center_id}
+	</if>
+	<if test="operate_name !=null and operate_name !=''">
+	and name = #{operate_name}
+	</if>
+	</select>
+</mapper>
+
+ 
+  
+  
+  
+   

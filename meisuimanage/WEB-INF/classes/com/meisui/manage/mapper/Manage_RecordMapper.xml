@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.meisui.manage.dao.Imanage_RecordDao">
+	<insert id="insertManageRecord" >
+		insert into t_manage_record 
+		(w_name,action,table_name,t_id,ip,create_time)
+		values(#{w_name},#{action},#{table_name},#{t_id},#{ip},#{create_time})
+	</insert>
+	<select id="getManageRecordList" resultType="com.meisui.manage.entity.Manage_Record">
+        select id,w_name,action,t_id,ip,create_time from t_manage_record where action not like "url%" 
+		<if test="s_time != null and s_time != ''">
+		 and create_time &gt;= #{s_time}
+		</if>
+		<if test="e_time != null and e_time != ''">
+		 and create_time &lt; #{e_time} 
+		</if>
+		 <if test="s != null and s != ''">
+		 and w_name like "%"#{s}"%"  
+		</if>
+         order by create_time desc limit #{offset},#{rows}
+    </select>
+    <select id="getManageRecordCount" resultType="Integer">
+		 select count(1) from t_manage_record where action not like "url%" 
+		<if test="s_time != null and s_time != ''">
+		 and create_time &gt;= #{s_time}
+		</if>
+		<if test="e_time != null and e_time != ''">
+		 and create_time &lt; #{e_time} 
+		</if>
+		<if test="s != null and s != ''">
+		 and w_name like "%"#{s}"%"  
+		</if>
+	</select>
+</mapper>

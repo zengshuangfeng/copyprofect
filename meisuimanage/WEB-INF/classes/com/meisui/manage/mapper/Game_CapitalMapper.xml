@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Igame_CapitalDao">
+	<select id="getGameCapitalList" resultType="com.meisui.manage.entity.Game_Capital">
+		select id,capital_pool,upper_limit,lower_limit,sign from t_game_capital
+	</select>
+	<select id="getGameCapital" resultType="com.meisui.manage.entity.Game_Capital">
+		select id,capital_pool,upper_limit,lower_limit,sign from t_game_capital where sign=#{sign}
+	</select>		
+	<insert id="insertGameCapital" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Game_Capital">
+		insert into t_game_capital
+		(capital_pool,upper_limit,lower_limit,sign)
+		values(#{capital_pool},#{upper_limit},#{lower_limit},#{sign})
+	</insert>	
+	<update id="updateGameCapital" parameterType="com.meisui.manage.entity.Game_Capital">
+		update t_game_capital set 
+		upper_limit=#{upper_limit},
+		lower_limit=#{lower_limit}
+		where id = #{id}
+	</update>	
+</mapper>

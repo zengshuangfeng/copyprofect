@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.meisui.manage.dao.Ianchor_PayDao">
+	<select id="getAnchorPayRuleList" resultType="com.meisui.manage.entity.Anchor_Pay_Rule">
+		select type,min_virtual_count,max_virtual_count,effect_days,week_reward,divide,is_day from t_anchor_pay_rule
+	</select>
+	<select id="getAnchorPayList" resultType="com.meisui.manage.entity.Anchor_Pay">
+		select uid,f_uuid,total_anchor_virtual,surplus_anchor_virtual,total_stake,divide,week_reward,gift_money,illegal_money,extra_money,total_money,effect_days,union_reward,create_time,start_time,end_time,w_name 
+		 from t_anchor_pay where 1=1 
+		 <if test="uid>0">
+		  and uid=#{uid}  
+		 </if>
+		 <if test="f_uuid>0">
+		  and f_uuid=#{f_uuid}  
+		 </if>
+		 <if test="union_id>0">
+		  and union_id=#{union_id}  
+		 </if>
+		 <if test="nickname != null and nickname != ''">
+		  and uid in (select id from t_user where nickname like "%"#{nickname}"%") 
+		 </if>
+		 <choose> 
+		 <when test="settle_type==1"><!-- settle_type:0周结  1日结 -->
+		 <![CDATA[ and create_time>CURRENT_DATE()]]>
+		 </when>
+		 <otherwise><![CDATA[ and start_time=#{start_time} and end_time=#{end_time} ]]></otherwise>
+		 </choose>
+          order by id limit #{offset},#{rows} 
+	</select>
+	<select id="getAnchorPayCount" resultType="Integer">
+		select count(1) 
+		 from t_anchor_pay where 1=1 
+		 <if test="uid>0">
+		  and uid=#{uid}  
+		 </if>
+		 <if test="f_uuid>0">
+		  and f_uuid=#{f_uuid}  
+		 </if>
+		 <if test="union_id>0">
+		  and union_id=#{union_id}  
+		 </if>
+		 <if test="nickname != null and nickname != ''">
+		  and uid in (select id from t_user where nickname like "%"#{nickname}"%") 
+		 </if>
+		  <choose> 
+		 <when test="settle_type==1"><!-- settle_type:0周结  1日结 -->
+		 <![CDATA[ and create_time>CURRENT_DATE()]]>
+		 </when>
+		 <otherwise><![CDATA[ and start_time=#{start_time} and end_time=#{end_time} ]]></otherwise>
+		 </choose>
+	</select>
+	<select id="getAnchorPay" resultType="com.meisui.manage.entity.Anchor_Pay">
+		select uid,f_uuid,total_anchor_virtual,surplus_anchor_virtual,total_stake,divide,week_reward,gift_money,illegal_money,total_money,effect_days 
+		 from t_anchor_pay where uid=#{uid} 
+		 <choose>
+		 <when test="settle_type==1"> and create_time>#{start_time} </when><!-- settle_type:0周结  1日结 -->
+		 <otherwise> and start_time=#{start_time} and end_time=#{end_time}  </otherwise>
+		 </choose>
+	</select>
+	<insert id="insertAnchorPayIllegal" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Pay_Illegal">
+		insert into t_anchor_pay_illegal
+		(uid,illegal_money,illegal_time,remark,create_time,w_name,type)
+		values(#{uid},#{illegal_money},#{illegal_time},#{remark},#{create_time},#{w_name},#{type})
+	</insert>	
+	<select id="getAnchorPayIllegalList" resultType="com.meisui.manage.entity.Anchor_Pay_Illegal">
+		select illegal_money,illegal_time,remark,w_name,type 
+		 from t_anchor_pay_illegal where uid=#{uid} order by create_time desc limit #{offset},#{rows}
+	</select>
+	<select id="getAnchorPayIllegalCount" resultType="Integer">
+		select count(1)
+		 from t_anchor_pay_illegal where uid=#{uid} 
+	</select>
+	<insert id="insertAnchorPay" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Pay">
+		insert into t_anchor_pay
+		(uid,f_uuid,union_id,total_anchor_virtual,surplus_anchor_virtual,total_stake,divide,week_reward,gift_money,illegal_money,total_money,start_time,end_time,create_time,w_name,is_commit,effect_days,extra_money,union_reward)
+		values(#{uid},#{f_uuid},#{union_id},#{total_anchor_virtual},#{surplus_anchor_virtual},#{total_stake},#{divide},#{week_reward},#{gift_money},#{illegal_money},#{total_money},#{start_time},#{end_time},#{create_time},#{w_name},#{is_commit},#{effect_days},#{extra_money},#{union_reward})
+	</insert>	
+	<select id="getAnchorPayIllegalSum" resultType="Double">
+		<![CDATA[select sum(illegal_money)
+		 from t_anchor_pay_illegal where uid=#{uid} and type=#{type} and illegal_time>=#{start_time} and illegal_time<=#{end_time} ]]>
+	</select>
+	<select id="getAnchorPayIllegalSum2" resultType="Double">
+		<![CDATA[select sum(illegal_money)
+		 from t_anchor_pay_illegal where uid=#{uid} and type=#{type} and create_time>=#{start_time} and create_time<=#{end_time} ]]>
+	</select>
+	<insert id="insertAnchorUnionPay" useGeneratedKeys="true" keyProperty="id" parameterType="com.meisui.manage.entity.Anchor_Union_Pay">
+		insert into t_anchor_union_pay
+		(union_id,start_time,end_time,create_time,w_name,is_commit)
+		values(#{union_id},#{start_time},#{end_time},#{create_time},#{w_name},#{is_commit})
+	</insert>
+	<select id="getAnchorUnionPayExist" resultType="Integer">
+		<![CDATA[ select id
+		 from t_anchor_union_pay where union_id=#{union_id} and start_time=#{start_time} and end_time=#{end_time} limit 1 ]]>
+	</select>
+	<select id="getUserTotalStake" resultType="Long">
+		select sum(stake) from t_user_stake where f_uuid=#{f_uuid} and is_secret = 0 
+		<if test="start_time!=null or end_time!=null">
+				<![CDATA[ and create_time>=#{start_time} and create_time<=#{end_time} ]]>
+		</if>
+	</select>
+	<select id="getAnchorLastPayDate" resultType="java.util.Date">
+		select create_time from t_anchor_pay where uid=#{uid} order by create_time desc limit 1
+	</select>
+	<select id="getAnchorPayIllegalListWithTime" resultType="com.meisui.manage.entity.Anchor_Pay_Illegal">
+		<![CDATA[select illegal_money,illegal_time,remark,type 
+		 from t_anchor_pay_illegal where uid=#{uid} and illegal_time>=#{start_time} and illegal_time<=#{end_time}]]>
+	</select>
+	<select id="getDayAnchorUnionPayExist" resultType="Integer">
+		<![CDATA[ select id
+		 from t_anchor_union_pay where union_id=#{union_id} and create_time>#{start_time} and create_time<#{end_time} limit 1 ]]>
+	</select>
+	<select id="getAnchorUnionPayExistList" resultType="Integer">
+		<![CDATA[ select union_id from t_anchor_union_pay where start_time=#{start_time} and end_time=#{end_time}]]>
+	</select>
+	<select id="getUserTotalGiftVirtual" resultType="Long">
+	  select sum(gift_virtual) from t_profit where uid=#{uid} and type=7 and create_time between #{start_time} and #{end_time}
+	</select>
+</mapper>
